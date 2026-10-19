@@ -101,7 +101,7 @@ gdzie:
 | Ruch | L | K | Punkty | Wyliczenie |
 |---|---|---|---|---|
 | Czyści 1 wiersz, bez kaskady | 1 | 1 | **10** | (10 + 0) × 1 |
-| Czyści wiersz i kolumnę jednocześnie | 2 | 1 | **40** | (10 + 10) × 1 |
+| Czyści wiersz i kolumnę jednocześnie | 2 | 1 | **20** | (10 + 10) × 1 |
 | Kaskada 2 poziomy: najpierw 1 linia, po niej kolejna | 1 | 2 | **20** | (10 + 0) × 2 |
 | Kaskada: na starcie 2 linie, potem jeszcze 1 | 2 | 2 | **40** | (10 + 10) × 2 |
 | Trzy linie naraz + podwójna kaskada | 3 | 3 | **120** | (10 + 20) × 4 |
@@ -145,7 +145,7 @@ Sprawdzenie sum:
 - **Wiersz 2:** 3 + 2 = **5** → znika!
 - **Kolumna 4:** 2 + 3 = **5** → znika też! (L = 2)
 - Pozostałe linie ≠ 5 (wiersz 3: 1 + 3 = 4).
-- Punkty za to postawienie (brak dalszej kaskady, K = 1): (10 + 10×1) × 2⁰ = 20 × 1 = **40**.
+- Punkty za to postawienie (brak dalszej kaskady, K = 1): (10 + 10×1) × 2⁰ = 20 × 1 = **20**.
 
 Po usunięciu wiersza 2 i kolumny 4:
 
