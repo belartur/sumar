@@ -1,0 +1,234 @@
+/* Sumar (nowa wersja) — styl mobile-first, waniliowy CSS. */
+:root {
+  --tlo: #0f3d2e;
+  --tlo2: #0b2e23;
+  --krem: #faf3df;
+  --krem-cien: #e7dcc0;
+  --akcent: #ffb703;
+  --akcent2: #fb8500;
+  --dobry: #2a9d8f;
+  --zly: #e63946;
+  --pelna: #ffd60a;
+  --tekst: #10231c;
+  --promien: 14px;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: radial-gradient(120% 90% at 50% 0%, var(--tlo) 0%, var(--tlo2) 70%);
+  color: var(--krem);
+  font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: max(10px, env(safe-area-inset-top)) 10px max(14px, env(safe-area-inset-bottom));
+}
+
+#app { width: 100%; max-width: 560px; }
+
+.sumar { display: flex; flex-direction: column; gap: 10px; }
+
+.gora {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.logo {
+  font-weight: 900;
+  font-size: 1.7rem;
+  letter-spacing: 0.35em;
+  color: var(--akcent);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.liczniki { display: flex; gap: 8px; }
+
+.licznik {
+  background: rgba(250, 243, 223, 0.1);
+  border: 1px solid rgba(250, 243, 223, 0.25);
+  border-radius: 10px;
+  padding: 4px 10px;
+  min-width: 64px;
+  text-align: center;
+}
+
+.licznik .etykieta { display: block; font-size: 0.68rem; opacity: 0.8; }
+.licznik strong { font-size: 1.15rem; }
+.licznik.wyrozniony { border-color: var(--akcent); }
+.licznik.wyrozniony strong { color: var(--akcent); }
+
+.komunikat {
+  min-height: 2.1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.komunikat.wyskakuj { animation: wyskakuj 0.35s ease; }
+@keyframes wyskakuj {
+  0% { transform: scale(0.96); }
+  60% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+/* cd. plansza + klocki + panele */
+
+.scena {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.sumy { display: contents; }
+.suma {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2em;
+  min-height: 2em;
+  border-radius: 8px;
+  font-weight: 800;
+  background: rgba(250, 243, 223, 0.12);
+  color: var(--krem);
+}
+
+.suma.cel { background: var(--pelna); color: #4a2c00; animation: puls 0.7s infinite alternate; }
+.suma.przegrzana { background: var(--zly); color: #fff; }
+@keyframes puls { from { transform: scale(1); } to { transform: scale(1.12); } }
+
+.plansza-obramowanie {
+  background: var(--krem);
+  border-radius: var(--promien);
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.plansza {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  touch-action: manipulation;
+}
+
+.pole {
+  aspect-ratio: 1;
+  border-radius: 9px;
+  background: #fffdf4;
+  border: 2px solid var(--krem-cien);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 6%;
+  transition: transform 0.08s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.pole.puste:hover { border-color: var(--dobry); transform: scale(1.04); }
+.pole.zajete { cursor: default; background: #fff; }
+.pole.cel-podswietlenie { outline: 3px solid var(--dobry); }
+.pole.podglad-ok { background: #d8f3dc; border-color: var(--dobry); transform: scale(1.05); }
+.pole.podglad-zle { background: #ffe5d9; border-color: var(--zly); }
+.pole.znika { animation: znika 0.45s ease forwards; }
+@keyframes znika {
+  40% { transform: scale(1.15) rotate(4deg); }
+  100% { transform: scale(0); opacity: 0; }
+}
+.pole.wpada { animation: wpada 0.22s ease; }
+@keyframes wpada {
+  from { transform: scale(1.25); }
+  to { transform: scale(1); }
+}
+
+/* oczka domina */
+.oczek { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; height: 100%; }
+.oczek i { border-radius: 50%; }
+.oczek i.on { background: var(--tekst); box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.4); }
+
+.trojka { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.klocek {
+  background: rgba(250, 243, 223, 0.08);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--krem);
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.1s ease;
+}
+.klocek .polowki { display: flex; gap: 5px; }
+.klocek .polowki.pion { flex-direction: column; }
+.klocek .polowka {
+  width: 40px;
+  height: 40px;
+  background: #fffdf4;
+  border-radius: 8px;
+  padding: 5px;
+  border: 2px solid var(--krem-cien);
+}
+.klocek.wybrany { border-color: var(--akcent); background: rgba(255, 183, 3, 0.16); transform: translateY(-2px); }
+.klocek.zuzyty { opacity: 0.35; cursor: default; }
+.klocek.bez-ruchu { opacity: 0.55; border-style: dashed; }
+.klocek .meta { font-size: 0.72rem; opacity: 0.9; }
+.klocek:not(.zuzyty):hover { border-color: var(--krem); }
+
+.dol { display: flex; gap: 8px; flex-wrap: wrap; }
+.przycisk {
+  flex: 1 1 auto;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--akcent);
+  color: #3a2500;
+}
+.przycisk.ghost { background: transparent; color: var(--krem); border: 2px solid rgba(250, 243, 223, 0.4); }
+.przycisk:active { transform: scale(0.97); }
+
+.nakladka {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 15, 12, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 20;
+}
+.karta {
+  background: var(--krem);
+  color: var(--tekst);
+  border-radius: 18px;
+  padding: 22px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+}
+.karta h2 { margin: 0 0 8px; }
+.karta .wynik-duzy { font-size: 2.6rem; font-weight: 900; color: var(--tlo); }
+.karta .rekord-linia { font-weight: 700; color: #7a4d00; }
+.karta ul { text-align: left; }
+
+.ukryty { display: none !important; }
+
+@media (min-width: 560px) {
+  .klocek .polowka { width: 46px; height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

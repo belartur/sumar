@@ -1,0 +1,62 @@
+// Testy kaskad Sumara (opis.md), cz. 2: scenariusz tury 4 i odmrażanie.
+import { describe, expect, it } from 'vitest';
+import type { Klocek } from './model.ts';
+import { postawIPrzelicz } from './rules.ts';
+import { planszaZ } from './probe.ts';
+
+describe('stawianie i kaskady', () => {
+  it('tura 4 z opisu: (2,3) V w kol. 4 → wiersz 2 i kolumna 4, 20 pkt', () => {
+    const p = planszaZ([
+      [1, null, 2, null, null],
+      [null, 3, null, null, null],
+      [1, null, null, null, null],
+      [null, null, 1, null, 2],
+      [null, null, null, null, null],
+    ]);
+    const w = postawIPrzelicz(p, { a: 2, b: 3, ori: 'V' }, 1, 3);
+    expect(w.linieStart).toBe(2);
+    expect(w.liczbaPoziomow).toBe(1);
+    expect(w.punkty).toBe(20);
+    expect(p[1]).toEqual([null, null, null, null, null]);
+    expect(p[2][3]).toBe(null);
+    expect(p[0][0]).toBe(1);
+    expect(p[0][2]).toBe(2);
+  });
+
+  it('odmrażanie: kolumna 7 → 5 po zniknięciu wiersza (K=2, 20 pkt)', () => {
+    const p = planszaZ([
+      [3, null, null, null, null],
+      [2, null, null, null, null],
+      [1, null, null, null, null],
+      [1, null, null, null, null],
+      [null, null, null, null, null],
+    ]);
+    const w = postawIPrzelicz(p, { a: 3, b: 1, ori: 'V' }, 1, 1);
+    expect(w.linieStart).toBe(1);
+    expect(w.liczbaPoziomow).toBe(2);
+    expect(w.punkty).toBe(20);
+    expect(w.poziomy[0].wiersze).toEqual([1]);
+    expect(w.poziomy[1].kolumny).toEqual([0]);
+    expect(p.map((r) => r[0])).toEqual([null, null, null, null, null]);
+  });
+
+  it('przecięcia linii liczone raz przy zdejmowaniu', () => {
+    // Wiersz 0 = 1+4 = 5 i kolumna 0 = 1+4 = 5 już na planszy.
+    // Stawiamy (0,0) H na dole, żeby odpalić kaskadę bez zmiany tych linii.
+    const p = planszaZ([
+      [1, null, 4, null, null],
+      [4, null, null, null, null],
+      [null, null, null, null, null],
+      [null, null, null, null, null],
+      [null, null, null, null, null],
+    ]);
+    const zero: Klocek = { a: 0, b: 0, ori: 'H' };
+    const w = postawIPrzelicz(p, zero, 4, 0);
+    expect(w.linieStart).toBe(2);
+    // Poziom 1: wiersz 0 → (0,0)=1, (0,2)=4; kolumna 0 → (0,0), (1,0)=4,
+    // a zero (4,0) też należy do kolumny 0 → 4 unikalne komórki, suma 9.
+    expect(w.poziomy[0].zdjete).toHaveLength(4);
+    expect(w.poziomy[0].zdjete.reduce((a, z) => a + z.v, 0)).toBe(9);
+    expect(w.punkty).toBe(20);
+  });
+});
