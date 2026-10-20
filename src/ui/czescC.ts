@@ -45,6 +45,15 @@ export function zbudujWidok(korzen: HTMLElement): Uchwyty {
   return { korzen: b.w, ...b, klocki, polowki, btnNowa, btnZasady, btnDzwiek, ...nak };
 }
 
+function punktyZasada(): DocumentFragment {
+  const f = document.createDocumentFragment();
+  f.append('Punkty: (L×(L+1)/2) × 2');
+  const sup = document.createElement('sup');
+  sup.textContent = 'K';
+  f.append(sup, '; L to sumaryczna liczba linii, K to sumaryczna liczba kaskad.');
+  return f;
+}
+
 function czescNakladek(): Pick<
   Uchwyty,
   'koniecNakladka' | 'koniecWynik' | 'koniecRekord' | 'zasadyNakladka' | 'btnJeszcze' | 'btnZamknij'
@@ -73,17 +82,18 @@ function czescNakladek(): Pick<
   const zh = document.createElement('h2');
   zh.textContent = 'Jak grać?';
   const ul = document.createElement('ul');
-  const zasady = [
+  const zasady: Array<string | Node> = [
     'Plansza 5×5 startuje pusta. Dostajesz trójki klocków domino (0–4 oczka).',
     'Orientacja klocka jest losowana — wybierasz kolejność i miejsce.',
     'Linia znika, gdy suma = 5. Puste pola liczą się jak 0.',
     'Suma powyżej 5 to linia przegrzana — wróci do gry po zniknięciu przecinającej linii.',
-    'Punkty: (L×(L+1)/2) × 2^K; L to sumaryczna liczba linii, K to sumaryczna ilość kaskad.',
+    punktyZasada(),
     'Koniec, gdy żaden pozostały klocek nie ma ruchu.',
   ];
   for (const z of zasady) {
     const li = document.createElement('li');
-    li.textContent = z;
+    if (typeof z === 'string') li.textContent = z;
+    else li.appendChild(z);
     ul.appendChild(li);
   }
   const btnZamknij = document.createElement('button');

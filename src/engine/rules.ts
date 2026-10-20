@@ -97,7 +97,7 @@ export function linieDoZdjecia(p: Plansza): { wiersze: number[]; kolumny: number
   };
 }
 
-/** Punktacja ruchu: L = sumaryczna liczba linii, K = sumaryczna ilość kaskad (0-bazowo). */
+/** Punktacja ruchu: L = sumaryczna liczba linii, K = sumaryczna liczba kaskad (0-bazowo). */
 export function punktyZaRuch(sumaLinii: number, kaskady: number): number {
   if (sumaLinii <= 0) return 0;
   const k = kaskady < 0 ? 0 : kaskady;
@@ -134,7 +134,7 @@ export function postawIPrzelicz(p: Plansza, k: Klocek, r: number, c: number): Wy
   const linieStart = poziomy.length > 0 ? poziomy[0].wiersze.length + poziomy[0].kolumny.length : 0;
   const liczbaPoziomow = poziomy.length;
   const sumaLinii = poziomy.reduce((s, p) => s + p.wiersze.length + p.kolumny.length, 0);
-  // K = sumaryczna ilość kaskad (0-bazowo): sam poziom 0 → K = 0, każda kolejna kaskada +1.
+  // K = sumaryczna liczba kaskad (0-bazowo): sam poziom 0 → K = 0, każda kolejna kaskada +1.
   const kaskady = liczbaPoziomow > 0 ? liczbaPoziomow - 1 : 0;
   const punktyPoPoziomach: number[] = [];
   const punktyPrzyrostowo: number[] = [];

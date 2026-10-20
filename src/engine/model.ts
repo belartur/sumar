@@ -51,7 +51,7 @@ export interface WynikRuchu {
   poziomy: PoziomKaskady[];
   /** L — sumaryczna liczba linii ze wszystkich poziomów. */
   sumaLinii: number;
-  /** K — sumaryczna ilość kaskad (indeks ostatniego poziomu, 0-bazowy; 0 gdy tylko poziom 0). */
+  /** K — sumaryczna liczba kaskad (indeks ostatniego poziomu, 0-bazowy; 0 gdy tylko poziom 0). */
   kaskady: number;
   /** Liczba poziomów kaskady (= poziomy.length; 0 gdy nic nie zniknęło). */
   liczbaPoziomow: number;

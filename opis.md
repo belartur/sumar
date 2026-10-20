@@ -91,7 +91,7 @@ punkty_ruchu = (L × (L + 1) / 2) × 2^K
 
 gdzie:
 - **L** — sumaryczna liczba linii (rzędów + kolumn) usuniętych we wszystkich poziomach,
-- **K** — sumaryczna ilość kaskad (0-bazowo: sam poziom 0 → K = 0, każda kolejna kaskada +1; ruch bez zniknięć daje 0 punktów),
+- **K** — sumaryczna liczba kaskad (0-bazowo: sam poziom 0 → K = 0, każda kolejna kaskada +1; ruch bez zniknięć daje 0 punktów),
 - **L × (L + 1) / 2** — *trójkątna baza*: 1 linia → 1, 2 linie → 3, 3 linie → 6…,
 - **2^K** — *mnożnik kaskady*: ×1 przy braku kaskady, ×2, ×4, ×8… przy coraz dłuższych seriach.
 
