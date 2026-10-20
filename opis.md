@@ -2,7 +2,7 @@
 
 ## 1. Idea główna
 
-„Sumar" to gra logiczna dla jednego gracza, rozgrywana na planszy **5×5**, która startuje pusta. Gracz otrzymuje po kolei **trójki losowych klocków domina** (każde pole klocka ma od **0 do 4 oczek**; obrót każdego klocka jest **losowany** w chwili rozdania — gracz go nie wybiera). Wszystkie trzy klocki z trójki muszą zostać postawione na planszy, ale gracz **wybiera kolejność**, w jakiej je ustawia. Zadanie polega na takim układaniu klocków, aby **suma oczek w rzędzie lub kolumnie wynosiła dokładnie 5** — wtedy cały rząd/kolumna **znika**, a gracz zdobywa punkty.
+„Sumar" to gra logiczna dla jednego gracza, rozgrywana na planszy **5×5**, która startuje pusta. Gracz otrzymuje po kolei **trójki losowych klocków domina** (każde pole klocka ma od **0 do 4 oczek**; pola bywają też **ujemne — od -1 do -4**, wtedy **obniżają** sumę rzędu/kolumny zamiast ją podwyższać; obrót każdego klocka jest **losowany** w chwili rozdania — gracz go nie wybiera). Wszystkie trzy klocki z trójki muszą zostać postawione na planszy, ale gracz **wybiera kolejność**, w jakiej je ustawia. Zadanie polega na takim układaniu klocków, aby **suma oczek w rzędzie lub kolumnie wynosiła dokładnie 5** — wtedy cały rząd/kolumna **znika**, a gracz zdobywa punkty.
 
 Rząd/kolumna nie musi być wypełniony, by zniknąć — liczy się tylko suma niepustych pól. Sumy **powyżej 5 nie są wyrokiem śmierci** — można je obniżyć, usuwając klocki z przecinających rzędów/kolumn.
 
@@ -10,12 +10,13 @@ Rząd/kolumna nie musi być wypełniony, by zniknąć — liczy się tylko suma 
 
 | Element | Opis |
 |---|---|
-| Plansza | Siatka 5×5 = 25 komórek; każda komórka jest pusta lub zajęta przez jedno pole klocka (wartość 0–4) |
-| Klocek (domino) | Dwa pola `(a, b)`, każde z wartością 0, 1, 2, 3 lub 4; układane na dwach **sąsiadujących** komórkach — poziomo lub pionowo |
+| Plansza | Siatka 5×5 = 25 komórek; każda komórka jest pusta lub zajęta przez jedno pole klocka (wartość -4..4, bez -0) |
+| Klocek (domino) | Dwa pola `(a, b)`, każde z wartością 0, 1, 2, 3, 4 albo ujemną -1, -2, -3, -4; układane na dwach **sąsiadujących** komórkach — poziomo lub pionowo |
+| Pole ujemne | Wartości **-1..-4** (nie ma -0, bo istnieje już +0). Powstaje **znacznie rzadziej** niż pole dodatnie (~10% na każde pole). Wizualnie: **jasnoczerwone tło** + narysowane oczka (tyle, ile wynosi wartość bezwzględna); bez znaku „−" na kafelku |
 | Obrót klocka | **Losowany** przy rozdaniu klocka; gracz nie ma wpływu na orientację danego klocka |
 | Licznik punktów | Wynik całkowity w punktach |
 | Trójka klocków | Gracz zawsze widzi komplet **trzech** klocków (każdy z wylosowanym obrotem); nie może żadnego wymienić ani odrzucić — musi postawić wszystkie trzy, sam wybierając **kolejność** ustawiania |
-| Stan linii | Każdy rząd i kolumna ma sumę oczek; stany: *niepełna* (suma < 5), *do usunięcia* (suma = 5), *przegrzana* (suma > 5) |
+| Stan linii | Każdy rząd i kolumna ma sumę oczek; stany: *niepełna* (suma < 5, w tym sumy ujemne), *do usunięcia* (suma = 5), *przegrzana* (suma > 5) |
 
 ## 3. Przebieg tury
 
@@ -34,7 +35,8 @@ Jedna tura = rozdanie **trójki klocków** i obowiązkowe postawienie wszystkich
 - **Rząd lub kolumna znika, gdy suma oczek w jego niepustych polach wynosi dokładnie 5.**
 - Linia **nie musi być wypełniona** — puste komórki nie wchodzą do sumy (tzn. liczą się jak 0).
 - Klocek z zerem oczek jest zwyczajnym klockiem: zajmuje miejsce i „zjada" potencjał sumy.
-- Linia o sumie < 5 po prostu czeka na dalsze dokładanie.
+- **Pola ujemne (-1..-4) odejmują się od sumy** — klocek ujemny to normalny klocek, który *obniża* sumę linii (np. żeby uratować przegrzany wiersz). Zasada znikania się nie zmienia: nadal liczy się dokładnie **5**.
+- Linia o sumie < 5 po prostu czeka na dalsze dokładanie. Suma może nawet spaść **poniżej 0** — taka linia też jest po prostu *niepełna* i nic specjalnego się z nią nie dzieje.
 - Linia o sumie = 5, wykryta w danym momencie, zostaje usunięta **natychmiast**.
 
 ### Przykład
@@ -42,6 +44,7 @@ Jedna tura = rozdanie **trójki klocków** i obowiązkowe postawienie wszystkich
 ```
 Wiersz 3 (kolumny 1–5):  [ puste ] [2] [ puste ] [3] [ puste ]  → suma = 5 → ZNIKA
 Kolumna 2 (wiersze 1–5): [1] [ puste ] [2] [4] [ puste ]        → suma = 7 → nie znika (patrz sekcja 5)
+Wiersz 4 (kolumny 1–5):  [4] [ puste ] [-1] [ puste ] [2]       → suma = 4 + (-1) + 2 = 5 → ZNIKA
 ```
 
 ## 5. Suma powyżej 5 — linia „przegrzana", nie martwa

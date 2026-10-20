@@ -1,6 +1,6 @@
 // Sumar — rysowanie trójki.
 import type { Klocek } from '../engine/model.ts';
-import { elOczek } from './oczka.ts';
+import { elOczek, etykietaWartosci } from './oczka.ts';
 import type { Uchwyty } from './uchwyty.ts';
 
 export function rysujTrojke(
@@ -16,12 +16,14 @@ export function rysujTrojke(
     p1.innerHTML = '';
     p0.appendChild(elOczek(s.klocek.a));
     p1.appendChild(elOczek(s.klocek.b));
+    p0.classList.toggle('ujemna', s.klocek.a < 0);
+    p1.classList.toggle('ujemna', s.klocek.b < 0);
     const pod = p0.parentElement;
     if (pod) pod.className = 'polowki' + (s.klocek.ori === 'V' ? ' pion' : '');
     const kier = s.klocek.ori === 'H' ? 'poziomy' : 'pionowy';
     btn.setAttribute(
       'aria-label',
-      `Klocek ${i + 1}: ${s.klocek.a} i ${s.klocek.b}, ${kier}${s.zuzyty ? ', postawiony' : ''}`,
+      `Klocek ${i + 1}: ${etykietaWartosci(s.klocek.a)} i ${etykietaWartosci(s.klocek.b)}, ${kier}${s.zuzyty ? ', postawiony' : ''}`,
     );
     btn.className =
       'klocek' + (s.zuzyty ? ' zuzyty' : '') + (wybrany === i ? ' wybrany' : '') + (!s.zuzyty && !ruchome[i] ? ' bez-ruchu' : '');

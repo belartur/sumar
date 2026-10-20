@@ -8,6 +8,8 @@ import {
   klonujPlansze,
   legalneRuchy,
   linieDoZdjecia,
+  losujKlocek,
+  losujWartoscPolowki,
   polaKlocka,
   postawIPrzelicz,
   punktyZaRuch,
@@ -93,6 +95,92 @@ describe('punktacja', () => {
   it('brak czyszczenia to 0 pkt', () => {
     expect(punktyZaRuch(0, 0)).toBe(0);
     expect(punktyZaRuch(0, 2)).toBe(0);
+  });
+});
+
+describe('klocki ujemne', () => {
+  const losZ = (r: number) => () => r;
+
+  it('pole ujemne: r>=0.9 daje -1..-4, nigdy -0', () => {
+    expect(losujWartoscPolowki(losZ(0.9))).toBe(-1);
+    // Uwaga: granice przedziałów zaburzone przez FP (np. r=0.95 wpada do -2),
+    // istotny jest rozkład ~2.5% na każdą wartość ujemną.
+    expect(losujWartoscPolowki(losZ(0.94))).toBe(-2);
+    expect(losujWartoscPolowki(losZ(0.96))).toBe(-3);
+    expect(losujWartoscPolowki(losZ(0.9999))).toBe(-4);
+    const v = losujWartoscPolowki(losZ(0.9));
+    expect(Object.is(v, -0)).toBe(false);
+  });
+
+  it('pole dodatnie: r<0.9 daje 0..4 (stare losy bez zmian)', () => {
+    expect(losujWartoscPolowki(losZ(0.0))).toBe(0);
+    expect(losujWartoscPolowki(losZ(0.18))).toBe(1);
+    expect(losujWartoscPolowki(losZ(0.89))).toBe(4);
+  });
+
+  it('wartości zawsze z zakresu -4..4 i bez -0 (próbkowanie)', () => {
+    for (let i = 0; i < 1000; i++) {
+      const v = losujWartoscPolowki(Math.random);
+      expect(v).toBeGreaterThanOrEqual(-4);
+      expect(v).toBeLessThanOrEqual(4);
+      expect(v === 0 || Math.abs(v) >= 1).toBe(true);
+      expect(Object.is(v, -0)).toBe(false);
+    }
+  });
+
+  it('występują wszystkie konfiguracje: (-,+), (-,-), (+,-)', () => {
+    // Mapowanie: los r → wartość. Dobieramy r tak, by wymusić ujemne/dodatnie.
+    const uj = (v: number): number => 0.9 + ((-v - 1) * 0.1) / 4 + 0.001; // r → -v
+    const dod = (v: number): number => (v * 0.9) / 5 + 0.001; // r → v
+    const k1 = losujKlocek(() => 0); // dodatnie + dodatnie + H (r<0.5)
+    expect(k1.a).toBe(0);
+    expect(k1.b).toBe(0);
+    expect(k1.ori).toBe('H');
+    // sekwencja: a=-2, b=3, ori(V): 3 wywołania na klocek
+    const sekw = [uj(-2), dod(3), 0.6];
+    let i = 0;
+    const k2 = losujKlocek(() => sekw[i++ % sekw.length]);
+    expect(k2.a).toBe(-2);
+    expect(k2.b).toBe(3);
+    expect(k2.ori).toBe('V');
+    // oba ujemne
+    const sekw2 = [uj(-1), uj(-4), 0.1];
+    let j = 0;
+    const k3 = losujKlocek(() => sekw2[j++ % sekw2.length]);
+    expect(k3.a).toBe(-1);
+    expect(k3.b).toBe(-4);
+  });
+
+  it('stary deterministyczny los 0.0 dalej daje klocek (0,0) H', () => {
+    const k = losujKlocek(() => 0);
+    expect(k).toEqual({ a: 0, b: 0, ori: 'H' });
+  });
+
+  it('suma linii: ujemne odejmują', () => {
+    expect(sumyLinii(planszaZ([[4, -1, null, 2, null]])).wiersze[0]).toBe(5);
+    expect(sumyLinii(planszaZ([[-2, -3, null, null, null]])).wiersze[0]).toBe(-5);
+  });
+
+  it('linia o sumie ujemnej jest niepełna (nie znika)', () => {
+    const p = planszaZ([[-2, -3, null, null, null]]);
+    expect(linieDoZdjecia(p).wiersze).toEqual([]);
+  });
+
+  it('postawienie z ujemną połówką domyka sumę do 5', () => {
+    // Wiersz 0 = [4, null, 3] → 7; stawiamy (-1,0) H w (0,1): 7 + (-1) + 0 = 6... lepiej:
+    // Wiersz 0 = [3, 3] → 6 (przegrzana); klocek (-1, 0) H na (0,2),(0,3): 6-1+0=5.
+    const p = planszaZ([[3, 3, null, null, null]]);
+    const w = postawIPrzelicz(p, { a: -1, b: 0, ori: 'H' }, 0, 2);
+    expect(w.sumaLinii).toBe(1);
+    expect(w.punkty).toBe(1);
+    expect(p[0].every((v) => v === null)).toBe(true);
+  });
+
+  it('klocek ujemny ustawia ujemną wartość na planszy', () => {
+    const p = pustaPlansza();
+    postawIPrzelicz(p, { a: -2, b: 4, ori: 'V' }, 1, 1);
+    expect(p[1][1]).toBe(-2);
+    expect(p[2][1]).toBe(4);
   });
 });
 

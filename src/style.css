@@ -10,6 +10,9 @@
   --zly: #e63946;
   --pelna: #ffd60a;
   --tekst: #10231c;
+  --ujemne-tlo: #ffcdd2;
+  --ujemne-obram: #c62828;
+  --ujemne-kropki: #7f0000;
   --promien: 14px;
   color-scheme: light;
 }
@@ -132,6 +135,16 @@ body {
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.65), inset 0 -3px 0 rgba(150, 90, 0, 0.25);
 }
 .pole.zajete .oczek i.on { background: #4a2c00; }
+/* Klocek ujemny: jasnoczerwone tło + ciemnoczerwone oczka. */
+.pole.zajete.ujemne {
+  background: linear-gradient(145deg, #ffdde0, var(--ujemne-tlo));
+  border-color: var(--ujemne-obram);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.65), inset 0 -3px 0 rgba(127, 0, 0, 0.3);
+}
+.pole.zajete.ujemne .oczek i.on { background: var(--ujemne-kropki); }
+.oczek.ujemne i.on { background: var(--ujemne-kropki); box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.4); }
+/* Podgląd „zle" nad ujemnym polem (wyższa specyficzność niż same ujemne). */
+.pole.zajete.ujemne.podglad-zle { background: #ffe5d9; border-color: var(--zly); box-shadow: none; }
 .pole.cel-podswietlenie { outline: 3px solid var(--dobry); }
 .pole.podglad-ok { background: #d8f3dc; border-color: var(--dobry); transform: scale(1.05); }
 .pole.podglad-zle { background: #ffe5d9; border-color: var(--zly); }
@@ -174,6 +187,10 @@ body {
   border-radius: 8px;
   padding: 5px;
   border: 2px solid var(--krem-cien);
+}
+.klocek .polowka.ujemna {
+  background: var(--ujemne-tlo);
+  border-color: var(--ujemne-obram);
 }
 .klocek.wybrany { border-color: var(--akcent); background: rgba(255, 183, 3, 0.16); transform: translateY(-2px); }
 .klocek.zuzyty { opacity: 0.35; cursor: default; }
@@ -280,6 +297,10 @@ body.dnd-aktywne .plansza { cursor: grabbing; }
   border: 3px solid var(--akcent);
   border-radius: 9px;
   padding: 5px;
+}
+.duch-polowka.ujemna {
+  background: var(--ujemne-tlo);
+  border-color: var(--ujemne-obram);
 }
 .duch.dobry .duch-polowka { border-color: var(--dobry); }
 .duch.zly .duch-polowka { border-color: var(--zly); }

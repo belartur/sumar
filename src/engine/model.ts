@@ -9,7 +9,7 @@ export const CEL = 5;
 /** Orientacja klocka wylosowana przy rozdaniu: 'H' = poziomo, 'V' = pionowo. */
 export type Orientacja = 'H' | 'V';
 
-/** Klocek domino: dwa pola o wartościach 0..4 + wylosowana orientacja. */
+/** Klocek domino: dwa pola o wartościach -4..4 bez -0 (ujemne -4..-1, dodatnie 0..4) + wylosowana orientacja. */
 export interface Klocek {
   a: number;
   b: number;
@@ -22,7 +22,7 @@ export interface Poz {
   c: number;
 }
 
-/** Komórka planszy: null = pusta, liczba 0..4 = oczka. */
+/** Komórka planszy: null = pusta, liczba -4..4 bez -0 = oczka (ujemne obniżają sumę linii). */
 export type Komorka = number | null;
 
 /** Plansza: ROZMIAR x ROZMIAR komórek. */

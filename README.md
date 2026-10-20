@@ -5,7 +5,7 @@ A single-player logic puzzle on a 5x5 board. Place domino tiles so rows or colum
 ## Rules
 
 - The 5x5 board starts empty.
-- Each turn you receive 3 domino tiles. Each half has 0–4 pips. Orientation (horizontal/vertical) is random and cannot be changed.
+- Each turn you receive 3 domino tiles. Each half has 0–4 pips; rarely (~10% per half) a half is negative (-1..-4, drawn on a light-red background) and subtracts from the line sum instead of adding. There is no -0. Orientation (horizontal/vertical) is random and cannot be changed.
 - You must place all 3 tiles, in any order, on two adjacent empty cells matching the tile orientation.
 - A row or column clears when the sum of its non-empty cells is exactly 5. Empty cells count as 0; the line does not need to be full.
 - A sum above 5 is "overheated", not dead: it can drop back to 5 when a crossing row/column clears and removes some of its cells.

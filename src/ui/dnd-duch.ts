@@ -19,7 +19,7 @@ export function zrobDucha(klocek: Klocek): HTMLElement {
   pud.className = 'duch-polowki' + (klocek.ori === 'V' ? ' pion' : '');
   for (const v of [klocek.a, klocek.b]) {
     const p = document.createElement('div');
-    p.className = 'duch-polowka';
+    p.className = 'duch-polowka' + (v < 0 ? ' ujemna' : '');
     p.appendChild(elOczek(v));
     pud.appendChild(p);
   }

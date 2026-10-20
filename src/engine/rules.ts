@@ -21,9 +21,21 @@ export function klonujPlansze(p: Plansza): Plansza {
   return p.map((w) => [...w]);
 }
 
-/** Losowa liczba całkowita 0..max-1. */
-function losInt(los: Los, max: number): number {
-  return Math.floor(los() * max);
+/** Prawdopodobieństwo, że pojedyncze pole klocka jest ujemne (-1..-4). */
+export const P_UJEMNA = 0.1;
+
+/**
+ * Losuje wartość jednego pola klocka: -4..-1 albo 0..4 (nigdy -0).
+ * Jedno wywołanie `los()` na pole, żeby nie zmieniać liczby losowań
+ * (stare deterministyczne testy ze stałym losem muszą dawać te same klocki).
+ */
+export function losujWartoscPolowki(los: Los): number {
+  const r = los();
+  if (r >= 1 - P_UJEMNA) {
+    const k = Math.min(3, Math.floor((r - (1 - P_UJEMNA)) / (P_UJEMNA / 4)));
+    return -(k + 1);
+  }
+  return Math.min(4, Math.floor(r / ((1 - P_UJEMNA) / 5)));
 }
 
 /** Losuje orientację klocka. */
@@ -31,9 +43,9 @@ export function losujOrientacje(los: Los): Orientacja {
   return los() < 0.5 ? 'H' : 'V';
 }
 
-/** Losuje jeden klocek: pola 0..4 + orientacja. */
+/** Losuje jeden klocek: pola -4..-1 albo 0..4 (nigdy -0) + orientacja. */
 export function losujKlocek(los: Los): Klocek {
-  return { a: losInt(los, 5), b: losInt(los, 5), ori: losujOrientacje(los) };
+  return { a: losujWartoscPolowki(los), b: losujWartoscPolowki(los), ori: losujOrientacje(los) };
 }
 
 /** Losuje trójkę klocków. */
@@ -77,7 +89,7 @@ export function maRuch(p: Plansza, k: Klocek): boolean {
   return false;
 }
 
-/** Sumy wierszy i kolumn (puste = 0). */
+/** Sumy wierszy i kolumn (puste = 0, ujemne odejmują się; suma może spaść poniżej 0). */
 export function sumyLinii(p: Plansza): { wiersze: number[]; kolumny: number[] } {
   const wiersze = p.map((w) => w.reduce<number>((s, v) => s + (v ?? 0), 0));
   const kolumny = Array.from({ length: ROZMIAR }, (_, c) => {

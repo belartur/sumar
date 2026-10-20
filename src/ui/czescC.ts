@@ -88,6 +88,7 @@ function czescNakladek(): Pick<
   const ul = document.createElement('ul');
   const zasady: Array<string | Node> = [
     'Plansza 5×5 startuje pusta. Dostajesz trójki klocków domino (0–4 oczka).',
+    'Pola klocków bywają też ujemne (1–4 oczka na czerwono, rzadziej) — obniżają sumę linii zamiast ją podwyższać.',
     'Orientacja klocka jest losowana — wybierasz kolejność i miejsce.',
     'Linia znika, gdy suma = 5. Puste pola liczą się jak 0.',
     'Suma powyżej 5 to linia przegrzana — wróci do gry po zniknięciu przecinającej linii.',

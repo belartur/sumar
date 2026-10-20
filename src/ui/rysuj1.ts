@@ -1,6 +1,6 @@
 // Sumar — rysowanie planszy, sum i trójki.
 import { CEL, ROZMIAR, type Plansza } from '../engine/model.ts';
-import { elOczek } from './oczka.ts';
+import { elOczek, etykietaWartosci } from './oczka.ts';
 import type { Uchwyty } from './uchwyty.ts';
 
 export function rysujPlansze(h: Uchwyty, p: Plansza, sw: number[], sk: number[]): void {
@@ -13,9 +13,9 @@ export function rysujPlansze(h: Uchwyty, p: Plansza, sw: number[], sk: number[])
         btn.className = 'pole puste';
         btn.setAttribute('aria-label', `Pole ${r + 1}, ${c + 1}, puste`);
       } else {
-        btn.className = 'pole zajete';
+        btn.className = 'pole zajete' + (v < 0 ? ' ujemne' : '');
         btn.appendChild(elOczek(v));
-        btn.setAttribute('aria-label', `Pole ${r + 1}, ${c + 1}, ${v}`);
+        btn.setAttribute('aria-label', `Pole ${r + 1}, ${c + 1}, ${etykietaWartosci(v)}`);
       }
     }
   }
