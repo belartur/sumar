@@ -18,8 +18,11 @@ export function rysujTrojke(
     p1.appendChild(elOczek(s.klocek.b));
     const pod = p0.parentElement;
     if (pod) pod.className = 'polowki' + (s.klocek.ori === 'V' ? ' pion' : '');
-    const kier = s.klocek.ori === 'H' ? '↔ poziomy' : '↕ pionowy';
-    h.metaKlockow[i].textContent = `${s.klocek.a}–${s.klocek.b} ${kier}`;
+    const kier = s.klocek.ori === 'H' ? 'poziomy' : 'pionowy';
+    btn.setAttribute(
+      'aria-label',
+      `Klocek ${i + 1}: ${s.klocek.a} i ${s.klocek.b}, ${kier}${s.zuzyty ? ', postawiony' : ''}`,
+    );
     btn.className =
       'klocek' + (s.zuzyty ? ' zuzyty' : '') + (wybrany === i ? ' wybrany' : '') + (!s.zuzyty && !ruchome[i] ? ' bez-ruchu' : '');
     btn.disabled = s.zuzyty;

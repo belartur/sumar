@@ -10,7 +10,6 @@ export function zbudujWidok(korzen: HTMLElement): Uchwyty {
   trojka.className = 'trojka';
   const klocki: HTMLButtonElement[] = [];
   const polowki: HTMLElement[][] = [];
-  const metaKlockow: HTMLElement[] = [];
   for (let i = 0; i < 3; i++) {
     const k = document.createElement('button');
     k.type = 'button';
@@ -22,13 +21,10 @@ export function zbudujWidok(korzen: HTMLElement): Uchwyty {
     const p1 = document.createElement('div');
     p1.className = 'polowka';
     pod.append(p0, p1);
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    k.append(pod, meta);
+    k.append(pod);
     trojka.appendChild(k);
     klocki.push(k);
     polowki.push([p0, p1]);
-    metaKlockow.push(meta);
   }
   b.w.appendChild(trojka);
   const dol = document.createElement('div');
@@ -46,7 +42,7 @@ export function zbudujWidok(korzen: HTMLElement): Uchwyty {
   const btnDzwiek = mkBtn('🔊 Dźwięk', true);
   b.w.appendChild(dol);
   const nak = czescNakladek();
-  return { korzen: b.w, ...b, klocki, polowki, metaKlockow, btnNowa, btnZasady, btnDzwiek, ...nak };
+  return { korzen: b.w, ...b, klocki, polowki, btnNowa, btnZasady, btnDzwiek, ...nak };
 }
 
 function czescNakladek(): Pick<

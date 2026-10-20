@@ -199,7 +199,6 @@ body {
 .klocek.wybrany { border-color: var(--akcent); background: rgba(255, 183, 3, 0.16); transform: translateY(-2px); }
 .klocek.zuzyty { opacity: 0.35; cursor: default; }
 .klocek.bez-ruchu { opacity: 0.55; border-style: dashed; }
-.klocek .meta { font-size: 0.72rem; opacity: 0.9; }
 .klocek:not(.zuzyty):hover { border-color: var(--krem); }
 
 .dol { display: flex; gap: 8px; flex-wrap: wrap; }

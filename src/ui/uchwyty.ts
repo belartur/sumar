@@ -6,7 +6,6 @@ export interface Uchwyty {
   sumyKolumn: HTMLElement[];
   klocki: HTMLButtonElement[];
   polowki: HTMLElement[][];
-  metaKlockow: HTMLElement[];
   punkty: HTMLElement;
   tura: HTMLElement;
   rekord: HTMLElement;
