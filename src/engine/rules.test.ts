@@ -80,16 +80,16 @@ describe('sumy linii', () => {
 });
 
 describe('punktacja', () => {
-  it('tabela z opisu (sekcja 7)', () => {
-    expect(punktyZaRuch(1, 1)).toBe(10);
-    expect(punktyZaRuch(2, 1)).toBe(20);
-    expect(punktyZaRuch(1, 2)).toBe(20);
-    expect(punktyZaRuch(2, 2)).toBe(40);
-    expect(punktyZaRuch(3, 3)).toBe(120);
+  it('nowy wzór: (L*(L+1)/2) * 2^K, L sumaryczne, K 0-bazowo', () => {
+    expect(punktyZaRuch(1, 0)).toBe(1);
+    expect(punktyZaRuch(2, 0)).toBe(3);
+    expect(punktyZaRuch(1, 1)).toBe(2);
+    expect(punktyZaRuch(2, 1)).toBe(6);
+    expect(punktyZaRuch(3, 2)).toBe(24);
   });
 
   it('brak czyszczenia to 0 pkt', () => {
     expect(punktyZaRuch(0, 0)).toBe(0);
-    expect(punktyZaRuch(1, 0)).toBe(0);
+    expect(punktyZaRuch(0, 2)).toBe(0);
   });
 });

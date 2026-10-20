@@ -78,7 +78,7 @@ function czescNakladek(): Pick<
     'Orientacja klocka jest losowana — wybierasz kolejność i miejsce.',
     'Linia znika, gdy suma = 5. Puste pola liczą się jak 0.',
     'Suma powyżej 5 to linia przegrzana — wróci do gry po zniknięciu przecinającej linii.',
-    'Punkty: (10 + 10×(L−1)) × 2^(K−1); L to linie naraz, K to poziomy kaskady.',
+    'Punkty: (L×(L+1)/2) × 2^K; L to sumaryczna liczba linii, K to sumaryczna ilość kaskad.',
     'Koniec, gdy żaden pozostały klocek nie ma ruchu.',
   ];
   for (const z of zasady) {

@@ -10,6 +10,7 @@ import { wczytajRekord } from './rekord.ts';
 import { przelaczWyciszenie, czyWyciszony } from './dzwiek.ts';
 import { wykonajRuch } from './ruch2.ts';
 import { podepnijDnd } from './dnd.ts';
+import { usunPlus } from './plus.ts';
 
 export class Kontroler {
   private gra = new Gra(Math.random);
@@ -108,6 +109,7 @@ export class Kontroler {
   }
 
   private nowaGra(): void {
+    usunPlus();
     this.porzucDnd?.();
     this.gra.odNowa();
     this.wybrany = null;

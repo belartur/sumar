@@ -97,10 +97,11 @@ export function linieDoZdjecia(p: Plansza): { wiersze: number[]; kolumny: number
   };
 }
 
-/** Punktacja ruchu: L = linie na poziomie 1, K = liczba poziomów. */
-export function punktyZaRuch(linieStart: number, liczbaPoziomow: number): number {
-  if (linieStart <= 0 || liczbaPoziomow <= 0) return 0;
-  return (10 + 10 * (linieStart - 1)) * 2 ** (liczbaPoziomow - 1);
+/** Punktacja ruchu: L = sumaryczna liczba linii, K = sumaryczna ilość kaskad (0-bazowo). */
+export function punktyZaRuch(sumaLinii: number, kaskady: number): number {
+  if (sumaLinii <= 0) return 0;
+  const k = kaskady < 0 ? 0 : kaskady;
+  return ((sumaLinii * (sumaLinii + 1)) / 2) * 2 ** k;
 }
 
 /**
@@ -132,7 +133,22 @@ export function postawIPrzelicz(p: Plansza, k: Klocek, r: number, c: number): Wy
 
   const linieStart = poziomy.length > 0 ? poziomy[0].wiersze.length + poziomy[0].kolumny.length : 0;
   const liczbaPoziomow = poziomy.length;
-  return { poziomy, linieStart, liczbaPoziomow, punkty: punktyZaRuch(linieStart, liczbaPoziomow) };
+  const sumaLinii = poziomy.reduce((s, p) => s + p.wiersze.length + p.kolumny.length, 0);
+  // K = sumaryczna ilość kaskad (0-bazowo): sam poziom 0 → K = 0, każda kolejna kaskada +1.
+  const kaskady = liczbaPoziomow > 0 ? liczbaPoziomow - 1 : 0;
+  const punktyPoPoziomach: number[] = [];
+  const punktyPrzyrostowo: number[] = [];
+  let narastajaceL = 0;
+  let poprzednie = 0;
+  for (let i = 0; i < poziomy.length; i++) {
+    narastajaceL += poziomy[i].wiersze.length + poziomy[i].kolumny.length;
+    const kumulant = punktyZaRuch(narastajaceL, i);
+    punktyPoPoziomach.push(kumulant);
+    punktyPrzyrostowo.push(kumulant - poprzednie);
+    poprzednie = kumulant;
+  }
+  const punkty = punktyPoPoziomach.length > 0 ? punktyPoPoziomach[punktyPoPoziomach.length - 1] : 0;
+  return { poziomy, sumaLinii, kaskady, liczbaPoziomow, linieStart, punkty, punktyPoPoziomach, punktyPrzyrostowo };
 }
 
 interface UsunietaKomorkaExt {

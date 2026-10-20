@@ -4,7 +4,7 @@ import { czyLegalny, klonujPlansze, polaKlocka, sumyLinii } from '../engine/rule
 import type { Kontroler } from './kontroler.ts';
 import { rysujPlansze, potrzasnij } from './rysuj.ts';
 import { animujKaskade } from './anim.ts';
-import { plusNaPlanszy } from './plus.ts';
+import { plusPrzyrostowy, plusKoniecRuchu } from './plus.ts';
 import { wyczyscPodglad, malujPodglad } from './podglad.ts';
 import { zapiszWynik } from './rekord.ts';
 import { dzwiekPostawienia, dzwiekCzyszczenia, dzwiekKonca, dzwiekRekordu } from './dzwiek.ts';
@@ -34,6 +34,14 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
   poPostawieniu[p1.r][p1.c] = klocek.a;
   poPostawieniu[p2.r][p2.c] = klocek.b;
 
+  // Wynik sumaryczny (z całej gry) zmienia się dopiero po zakończonym ruchu,
+  // więc zamrażamy wyświetloną sumę na czas kaskady.
+  const punktyPrzedRuchem = g.punkty;
+  const zamrozPunkty = (): void => {
+    h.punkty.textContent = String(punktyPrzedRuchem);
+    h.rekord.textContent = String(Math.max(k.rekordRef, punktyPrzedRuchem));
+  };
+
   const wynik = g.postaw(slot, r, c);
   k.wybranyRef = null;
 
@@ -41,22 +49,28 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
     const s = sumyLinii(p);
     rysujPlansze(h, p, s.wiersze, s.kolumny);
   };
-  // 1) Pokaż postawiony klocek (punkty/tura już po ruchu).
+  // 1) Pokaż postawiony klocek (punkty wciąż sprzed ruchu — aż do jego końca).
   rysujTlo(poPostawieniu);
   h.pola[p1.r][p1.c].classList.add('wpada');
   h.pola[p2.r][p2.c].classList.add('wpada');
   k.odswiezRef();
+  zamrozPunkty();
   // Odświeżenie zresetowało klasy animacji — nałóż je ponownie na stan po postawieniu.
   rysujTlo(poPostawieniu);
   h.pola[p1.r][p1.c].classList.add('wpada');
   h.pola[p2.r][p2.c].classList.add('wpada');
 
-  // 2) Kaskada poziom po poziomie + pływające „+N" nad środkiem zdjęć.
+  // 2) Kaskada poziom po poziomie. Po każdej kaskadzie pojawia się NOWY dymek
+  // z deltą: A, B-A, C-B, … — dymki sumują się do punktów za cały ruch.
+  // Każdy dymek nad środkiem pól zdjętych na SWOIM poziomie.
   if (wynik.liczbaPoziomow > 0) {
     dzwiekCzyszczenia(wynik.liczbaPoziomow);
-    const srodek = wynik.poziomy[0].zdjete;
-    await animujKaskade(h, poPostawieniu, wynik.poziomy, rysujTlo);
-    plusNaPlanszy(h, wynik.punkty, srodek);
+    await animujKaskade(h, poPostawieniu, wynik.poziomy, rysujTlo, (i) => {
+      plusPrzyrostowy(h, wynik.punktyPrzyrostowo[i], wynik.poziomy[i].zdjete, i);
+      zamrozPunkty();
+    });
+    // Dymki znikają niezależnie ~1400ms po swoim pojawieniu.
+    plusKoniecRuchu();
   }
 
   k.zajetyRef = false;

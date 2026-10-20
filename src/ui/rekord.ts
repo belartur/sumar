@@ -1,9 +1,17 @@
 // Sumar — rekord w localStorage (klucz odrębny od innych wersji).
-const KLUCZ = 'sumar-nowa:rekord:v1';
+// v2: nowy wzór punktacji (L*(L+1)/2 * 2^K) — stare rekordy nieporównywalne, startujemy od zera.
+const KLUCZ = 'sumar-nowa:rekord:v2';
+const STARY_KLUCZ = 'sumar-nowa:rekord:v1';
 
 export function wczytajRekord(): number {
   try {
     const surowe = localStorage.getItem(KLUCZ);
+    // Ze względu na zmianę wzoru: przy pierwszym odczycie wyczyść stare rekordy.
+    try {
+      localStorage.removeItem(STARY_KLUCZ);
+    } catch {
+      /* brak dostępu — gra działa dalej */
+    }
     const n = surowe === null ? 0 : Number.parseInt(surowe, 10);
     return Number.isFinite(n) && n > 0 ? n : 0;
   } catch {

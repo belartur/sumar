@@ -49,11 +49,20 @@ export interface PoziomKaskady {
 /** Wynik jednego postawienia klocka. */
 export interface WynikRuchu {
   poziomy: PoziomKaskady[];
-  /** L — liczba linii na pierwszym poziomie. */
-  linieStart: number;
-  /** K — liczba poziomów kaskady (0 gdy nic nie zniknęło). */
+  /** L — sumaryczna liczba linii ze wszystkich poziomów. */
+  sumaLinii: number;
+  /** K — sumaryczna ilość kaskad (indeks ostatniego poziomu, 0-bazowy; 0 gdy tylko poziom 0). */
+  kaskady: number;
+  /** Liczba poziomów kaskady (= poziomy.length; 0 gdy nic nie zniknęło). */
   liczbaPoziomow: number;
+  /** L — liczba linii na pierwszym poziomie (pomocniczo, do testów). */
+  linieStart: number;
+  /** Punkty końcowe za ruch. */
   punkty: number;
+  /** Punkty narastająco po każdej kaskadzie (gdyby ruch zakończył się w tym momencie). */
+  punktyPoPoziomach: number[];
+  /** Punkty przyrostowo na każdy poziom: [A, B-A, C-B, …]; suma = punkty. */
+  punktyPrzyrostowo: number[];
 }
 
 /** Funkcja losująca z przedziału [0, 1). Wstrzykiwana dla testowalności. */

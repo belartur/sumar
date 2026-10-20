@@ -5,7 +5,7 @@ import { postawIPrzelicz } from './rules.ts';
 import { planszaZ } from './probe.ts';
 
 describe('stawianie i kaskady', () => {
-  it('tura 4 z opisu: (2,3) V w kol. 4 → wiersz 2 i kolumna 4, 20 pkt', () => {
+  it('tura 4 z opisu: (2,3) V w kol. 4 → wiersz 2 i kolumna 4, 3 pkt', () => {
     const p = planszaZ([
       [1, null, 2, null, null],
       [null, 3, null, null, null],
@@ -16,14 +16,18 @@ describe('stawianie i kaskady', () => {
     const w = postawIPrzelicz(p, { a: 2, b: 3, ori: 'V' }, 1, 3);
     expect(w.linieStart).toBe(2);
     expect(w.liczbaPoziomow).toBe(1);
-    expect(w.punkty).toBe(20);
+    expect(w.sumaLinii).toBe(2);
+    expect(w.kaskady).toBe(0);
+    expect(w.punktyPoPoziomach).toEqual([3]);
+    expect(w.punktyPrzyrostowo).toEqual([3]);
+    expect(w.punkty).toBe(3);
     expect(p[1]).toEqual([null, null, null, null, null]);
     expect(p[2][3]).toBe(null);
     expect(p[0][0]).toBe(1);
     expect(p[0][2]).toBe(2);
   });
 
-  it('odmrażanie: kolumna 7 → 5 po zniknięciu wiersza (K=2, 20 pkt)', () => {
+  it('odmrażanie: kolumna 7 → 5 po zniknięciu wiersza (K=1, 6 pkt)', () => {
     const p = planszaZ([
       [3, null, null, null, null],
       [2, null, null, null, null],
@@ -34,7 +38,14 @@ describe('stawianie i kaskady', () => {
     const w = postawIPrzelicz(p, { a: 3, b: 1, ori: 'V' }, 1, 1);
     expect(w.linieStart).toBe(1);
     expect(w.liczbaPoziomow).toBe(2);
-    expect(w.punkty).toBe(20);
+    expect(w.sumaLinii).toBe(2);
+    expect(w.kaskady).toBe(1);
+    // Po 0. kaskadzie gracz dostałby 1 pkt, gdyby ruch się tam zakończył.
+    expect(w.punktyPoPoziomach).toEqual([1, 6]);
+    // Dymki przyrostowe: +1, potem +5 — sumują się do 6.
+    expect(w.punktyPrzyrostowo).toEqual([1, 5]);
+    expect(w.punktyPrzyrostowo.reduce((a, b) => a + b, 0)).toBe(w.punkty);
+    expect(w.punkty).toBe(6);
     expect(w.poziomy[0].wiersze).toEqual([1]);
     expect(w.poziomy[1].kolumny).toEqual([0]);
     expect(p.map((r) => r[0])).toEqual([null, null, null, null, null]);
@@ -57,6 +68,9 @@ describe('stawianie i kaskady', () => {
     // a zero (4,0) też należy do kolumny 0 → 4 unikalne komórki, suma 9.
     expect(w.poziomy[0].zdjete).toHaveLength(4);
     expect(w.poziomy[0].zdjete.reduce((a, z) => a + z.v, 0)).toBe(9);
-    expect(w.punkty).toBe(20);
+    expect(w.sumaLinii).toBe(2);
+    expect(w.kaskady).toBe(0);
+    expect(w.punktyPrzyrostowo).toEqual([3]);
+    expect(w.punkty).toBe(3);
   });
 });
