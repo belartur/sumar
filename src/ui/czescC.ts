@@ -54,6 +54,10 @@ function punktyZasada(): DocumentFragment {
   return f;
 }
 
+function bonusZasada(): string {
+  return 'Całkowite wyczyszczenie planszy: bonus 5N+5 (N = liczba dotychczas wyczyszczonych, od 0).';
+}
+
 function czescNakladek(): Pick<
   Uchwyty,
   'koniecNakladka' | 'koniecWynik' | 'koniecRekord' | 'zasadyNakladka' | 'btnJeszcze' | 'btnZamknij'
@@ -88,6 +92,7 @@ function czescNakladek(): Pick<
     'Linia znika, gdy suma = 5. Puste pola liczą się jak 0.',
     'Suma powyżej 5 to linia przegrzana — wróci do gry po zniknięciu przecinającej linii.',
     punktyZasada(),
+    bonusZasada(),
     'Koniec, gdy żaden pozostały klocek nie ma ruchu.',
   ];
   for (const z of zasady) {

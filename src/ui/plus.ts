@@ -41,6 +41,25 @@ function srodekKomorek(
 export function plusNaPlanszy(h: Uchwyty, punkty: number, komorki: Array<{ r: number; c: number }>): void {
   plusPrzyrostowy(h, punkty, komorki, 0);
 }
+/** Duży dymek bonusu za całkowite wyczyszczenie planszy (osobna klasa, środek planszy). */
+export function plusCzystaPlansza(h: Uchwyty, bonus: number): void {
+  if (bonus <= 0) return;
+  const plansza = h.pola[2]?.[2]?.closest('.plansza-obramowanie') as HTMLElement | null;
+  if (!plansza) return;
+  const el = document.createElement('div');
+  el.className = 'plus-punkty plus-czysta';
+  el.textContent = `+${bonus} CZYSTA!`;
+  el.style.left = '50%';
+  el.style.top = '40%';
+  plansza.appendChild(el);
+  dymki.push(el);
+  const t = window.setTimeout(() => {
+    el.remove();
+    dymki = dymki.filter((d) => d !== el);
+  }, CZAS_DYMKA_MS + 600);
+  timery.push(t);
+}
+
 
 /**
  * Nowy dymek przyrostowy po kolejnej kaskadzie: zawsze nowy element,

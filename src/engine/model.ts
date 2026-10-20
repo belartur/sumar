@@ -57,12 +57,14 @@ export interface WynikRuchu {
   liczbaPoziomow: number;
   /** L — liczba linii na pierwszym poziomie (pomocniczo, do testów). */
   linieStart: number;
-  /** Punkty końcowe za ruch. */
+  /** Punkty końcowe za ruch (same linie, bez bonusu za całą planszę). */
   punkty: number;
   /** Punkty narastająco po każdej kaskadzie (gdyby ruch zakończył się w tym momencie). */
   punktyPoPoziomach: number[];
   /** Punkty przyrostowo na każdy poziom: [A, B-A, C-B, …]; suma = punkty. */
   punktyPrzyrostowo: number[];
+  /** Czy po pełnej kaskadzie plansza jest w 100% pusta (bonus za czyszczenie). */
+  czyCzystaPlansza: boolean;
 }
 
 /** Funkcja losująca z przedziału [0, 1). Wstrzykiwana dla testowalności. */

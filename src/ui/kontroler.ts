@@ -129,6 +129,7 @@ export class Kontroler {
     rysujTrojke(h, gra.trojka, this.wybrany, ruchome);
     h.punkty.textContent = String(gra.punkty);
     h.tura.textContent = String(gra.tura);
+    h.czyste.textContent = String(gra.wyczyszczonePlansze);
     h.rekord.textContent = String(Math.max(this.rekord, gra.punkty));
   }
 

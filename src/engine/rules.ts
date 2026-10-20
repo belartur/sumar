@@ -97,6 +97,17 @@ export function linieDoZdjecia(p: Plansza): { wiersze: number[]; kolumny: number
   };
 }
 
+/** Czy plansza jest w 100% pusta (wszystkie pola null). */
+export function czyPustaPlansza(p: Plansza): boolean {
+  return p.every((w) => w.every((v) => v === null));
+}
+
+/** Bonus za całkowite wyczyszczenie planszy: 5*N + 5, gdzie N = liczba dotychczas wyczyszczonych. */
+export function bonusZaCalaPlansze(nDotychczas: number): number {
+  const n = nDotychczas < 0 ? 0 : Math.floor(nDotychczas);
+  return 5 * n + 5;
+}
+
 /** Punktacja ruchu: L = sumaryczna liczba linii, K = sumaryczna liczba kaskad (0-bazowo). */
 export function punktyZaRuch(sumaLinii: number, kaskady: number): number {
   if (sumaLinii <= 0) return 0;
@@ -148,7 +159,8 @@ export function postawIPrzelicz(p: Plansza, k: Klocek, r: number, c: number): Wy
     poprzednie = kumulant;
   }
   const punkty = punktyPoPoziomach.length > 0 ? punktyPoPoziomach[punktyPoPoziomach.length - 1] : 0;
-  return { poziomy, sumaLinii, kaskady, liczbaPoziomow, linieStart, punkty, punktyPoPoziomach, punktyPrzyrostowo };
+  const czyCzystaPlansza = liczbaPoziomow > 0 && czyPustaPlansza(p);
+  return { poziomy, sumaLinii, kaskady, liczbaPoziomow, linieStart, punkty, punktyPoPoziomach, punktyPrzyrostowo, czyCzystaPlansza };
 }
 
 interface UsunietaKomorkaExt {

@@ -102,6 +102,21 @@ C−B itd. Dymki sumują się do punktów za cały ruch
 (A + (B−A) + (C−B) = C). Wynik sumaryczny (z całej gry) zmienia się dopiero
 po zakończonym ruchu.
 
+### Bonus za całkowite wyczyszczenie planszy
+
+Gdy po postawieniu klocka i pełnej kaskadzie plansza jest w **100% pusta**
+(wszystkie 25 pól puste), gracz dostaje dodatkowy bonus:
+
+```
+bonus = 5×N + 5
+```
+
+gdzie **N** — liczba dotychczas całkowicie wyczyszczonych plansz w tej grze
+(od 0, reset przy nowej grze). Czyli 1. wyczyszczenie daje +5, 2. daje +10,
+3. daje +15 itd. Bonus dolicza się do punktów za linie z tego ruchu
+(łącznie: linie + bonus) i pokazywany jest osobnym dużym dymkiem
+„+N CZYSTA!”. Licznik N (`CZYSTE`) jest zawsze widoczny na ekranie, od startu gry.
+
 ### Przykłady obliczeń
 
 | Ruch | L | K | Punkty | Wyliczenie |

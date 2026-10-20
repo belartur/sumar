@@ -2,7 +2,9 @@
 import { describe, expect, it } from 'vitest';
 import { CEL } from './model.ts';
 import {
+  bonusZaCalaPlansze,
   czyLegalny,
+  czyPustaPlansza,
   klonujPlansze,
   legalneRuchy,
   linieDoZdjecia,
@@ -91,5 +93,50 @@ describe('punktacja', () => {
   it('brak czyszczenia to 0 pkt', () => {
     expect(punktyZaRuch(0, 0)).toBe(0);
     expect(punktyZaRuch(0, 2)).toBe(0);
+  });
+});
+
+describe('całkowite czyszczenie planszy', () => {
+  it('czyPustaPlansza: pusta vs zajęta', () => {
+    expect(czyPustaPlansza(pustaPlansza())).toBe(true);
+    const p = pustaPlansza();
+    p[2][2] = 1;
+    expect(czyPustaPlansza(p)).toBe(false);
+  });
+
+  it('bonus 5N+5: N=0 → 5, N=1 → 10, N=2 → 15', () => {
+    expect(bonusZaCalaPlansze(0)).toBe(5);
+    expect(bonusZaCalaPlansze(1)).toBe(10);
+    expect(bonusZaCalaPlansze(2)).toBe(15);
+  });
+
+  it('ruch bez kaskady nie daje flagi czystej planszy', () => {
+    const w = postawIPrzelicz(pustaPlansza(), { a: 1, b: 1, ori: 'H' }, 0, 0);
+    expect(w.liczbaPoziomow).toBe(0);
+    expect(w.czyCzystaPlansza).toBe(false);
+    expect(w.punkty).toBe(0);
+  });
+
+  it('jedyny klocek (2,3) zdjęty linią czyści planszę', () => {
+    // Plansza: wiersz 0 = [2, null x4], stawiamy (0,3) H w (0,1) → wiersz 0 = 5 → znika wszystko.
+    const p = planszaZ([[2, null, null, null, null]]);
+    const w = postawIPrzelicz(p, { a: 0, b: 3, ori: 'H' }, 0, 1);
+    expect(w.sumaLinii).toBe(1);
+    expect(w.punkty).toBe(1);
+    expect(w.czyCzystaPlansza).toBe(true);
+    expect(czyPustaPlansza(p)).toBe(true);
+  });
+
+  it('kaskada bez pełnego wyczyszczenia nie daje flagi', () => {
+    const p = planszaZ([
+      [1, null, 2, null, null],
+      [null, 3, null, null, null],
+      [1, null, null, null, null],
+      [null, null, 1, null, 2],
+      [null, null, null, null, null],
+    ]);
+    const w = postawIPrzelicz(p, { a: 2, b: 3, ori: 'V' }, 1, 3);
+    expect(w.punkty).toBe(3);
+    expect(w.czyCzystaPlansza).toBe(false);
   });
 });

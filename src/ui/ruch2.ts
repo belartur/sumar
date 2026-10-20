@@ -4,7 +4,7 @@ import { czyLegalny, klonujPlansze, polaKlocka, sumyLinii } from '../engine/rule
 import type { Kontroler } from './kontroler.ts';
 import { rysujPlansze, potrzasnij } from './rysuj.ts';
 import { animujKaskade } from './anim.ts';
-import { plusPrzyrostowy, plusKoniecRuchu } from './plus.ts';
+import { plusCzystaPlansza, plusPrzyrostowy, plusKoniecRuchu } from './plus.ts';
 import { wyczyscPodglad, malujPodglad } from './podglad.ts';
 import { zapiszWynik } from './rekord.ts';
 import { dzwiekPostawienia, dzwiekCzyszczenia, dzwiekKonca, dzwiekRekordu } from './dzwiek.ts';
@@ -69,6 +69,7 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
       plusPrzyrostowy(h, wynik.punktyPrzyrostowo[i], wynik.poziomy[i].zdjete, i);
       zamrozPunkty();
     });
+    if (wynik.bonusCzysta > 0) plusCzystaPlansza(h, wynik.bonusCzysta);
     // Dymki znikają niezależnie ~1400ms po swoim pojawieniu.
     plusKoniecRuchu();
   }

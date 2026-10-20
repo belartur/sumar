@@ -7,7 +7,7 @@ import {
   type SlotTrojki,
   type WynikRuchu,
 } from './model.ts';
-import { klonujPlansze, losujTrojke, maRuch, postawIPrzelicz, pustaPlansza, sumyLinii } from './rules.ts';
+import { bonusZaCalaPlansze, klonujPlansze, losujTrojke, maRuch, postawIPrzelicz, pustaPlansza, sumyLinii } from './rules.ts';
 
 export interface PodsumowanieRuchu extends WynikRuchu {
   /** Indeks slotu w trójce, który postawiono. */
@@ -18,6 +18,12 @@ export interface PodsumowanieRuchu extends WynikRuchu {
   trojkaWyczerpana: boolean;
   /** Czy gra się zakończyła tym ruchem. */
   koniecGry: boolean;
+  /** N przed ruchem (liczba dotychczas wyczyszczonych plansz). */
+  nCzystychPrzed: number;
+  /** Bonus za całkowite wyczyszczenie planszy (0 gdy brak). */
+  bonusCzysta: number;
+  /** Łączne punkty za ruch: linie + bonus za całą planszę. */
+  punktyRazem: number;
 }
 
 export class Gra {
@@ -27,6 +33,8 @@ export class Gra {
   trojka: SlotTrojki[] = [];
   koniec = false;
   wykonanychRuchow = 0;
+  /** N — liczba dotychczas całkowicie wyczyszczonych plansz (od 0, reset na nową grę). */
+  wyczyszczonePlansze = 0;
 
   constructor(private los: Los = Math.random) {}
 
@@ -37,6 +45,7 @@ export class Gra {
     this.tura = 1;
     this.koniec = false;
     this.wykonanychRuchow = 0;
+    this.wyczyszczonePlansze = 0;
     this.rozdajTrojke();
     // Świeża pusta plansza zawsze ma ruchy, ale sprawdzamy dla spójności.
     if (!this.jestJakisRuch()) this.koniec = true;
@@ -82,7 +91,11 @@ export class Gra {
 
     const wynik = postawIPrzelicz(this.plansza, s.klocek, r, c);
     s.zuzyty = true;
-    this.punkty += wynik.punkty;
+    const nCzystychPrzed = this.wyczyszczonePlansze;
+    const bonusCzysta = wynik.czyCzystaPlansza ? bonusZaCalaPlansze(nCzystychPrzed) : 0;
+    if (wynik.czyCzystaPlansza) this.wyczyszczonePlansze++;
+    const punktyRazem = wynik.punkty + bonusCzysta;
+    this.punkty += punktyRazem;
     this.wykonanychRuchow++;
 
     const wyczerpana = this.trojka.every((x) => x.zuzyty);
@@ -100,6 +113,6 @@ export class Gra {
     }
 
     if (koniecGry) this.koniec = true;
-    return { ...wynik, slot, kotwica: { r, c }, trojkaWyczerpana: wyczerpana, koniecGry };
+    return { ...wynik, slot, kotwica: { r, c }, trojkaWyczerpana: wyczerpana, koniecGry, nCzystychPrzed, bonusCzysta, punktyRazem };
   }
 }

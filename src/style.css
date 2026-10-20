@@ -247,6 +247,16 @@ body {
   100% { opacity: 0; transform: translate(-50%, -160%) scale(1.05); }
 }
 
+/* Duży dymek bonusu za całkowite wyczyszczenie planszy */
+.plus-punkty.plus-czysta {
+  font-size: 1.6rem;
+  background: #2a9d8f;
+  border-color: #0b2e23;
+  color: #fffdf4;
+  white-space: nowrap;
+  animation-duration: 2s;
+}
+
 /* Przeciąganie klocka */
 .klocek { touch-action: none; }
 .klocek.ciagniety { opacity: 0.45; }

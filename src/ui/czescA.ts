@@ -6,6 +6,7 @@ export interface SzkieletA {
   punkty: HTMLElement;
   tura: HTMLElement;
   rekord: HTMLElement;
+  czyste: HTMLElement;
   sumyKolumn: HTMLElement[];
 }
 
@@ -35,6 +36,7 @@ export function czescA(korzen: HTMLElement): SzkieletA {
   };
   const punkty = mk('PUNKTY', true);
   const tura = mk('TURA', false);
+  const czyste = mk('CZYSTE', false);
   const rekord = mk('REKORD', false);
   const pasek = document.createElement('div');
   pasek.style.cssText = 'display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center;';
@@ -54,5 +56,5 @@ export function czescA(korzen: HTMLElement): SzkieletA {
   pasek.append(rog, rzad);
   w.append(gora, pasek);
   korzen.appendChild(w);
-  return { w, punkty, tura, rekord, sumyKolumn };
+  return { w, punkty, tura, czyste, rekord, sumyKolumn };
 }

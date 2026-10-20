@@ -11,6 +11,7 @@ A single-player logic puzzle on a 5x5 board. Place domino tiles so rows or colum
 - A sum above 5 is "overheated", not dead: it can drop back to 5 when a crossing row/column clears and removes some of its cells.
 - Clearing runs in cascade levels: after each placement all lines summing to 5 clear at once, sums are recalculated, and new lines at 5 clear on the next level.
 - Scoring per placement: `(L * (L + 1) / 2) * 2^K`, where `L` is the total number of lines cleared across all levels and `K` is the total number of cascades (0-based: level 0 alone → K = 0). A placement with no clears scores 0. After each cascade a separate bubble shows incremental points (A, B-A, C-B, …) that sum to the move total; the running total only changes once the move is finished.
+- Full board clear bonus: when a placement + full cascade leaves the 5x5 board 100% empty, add `5*N + 5` where `N` is the number of previously cleared boards in this game (from 0, reset on new game). 1st clear +5, 2nd +10, 3rd +15… The `CZYSTE` (N) counter is always visible from game start.
 - Game over when none of the remaining tiles has a legal placement. Final score is the sum of all placements.
 
 ## Run / Build
