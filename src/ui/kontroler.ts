@@ -9,6 +9,7 @@ import { wyczyscPodglad, malujPodglad } from './podglad.ts';
 import { wczytajRekord } from './rekord.ts';
 import { przelaczWyciszenie, czyWyciszony } from './dzwiek.ts';
 import { wykonajRuch } from './ruch2.ts';
+import { podepnijDnd } from './dnd.ts';
 
 export class Kontroler {
   private gra = new Gra(Math.random);
@@ -16,6 +17,9 @@ export class Kontroler {
   private wybrany: number | null = null;
   private zajety = false;
   private rekord = 0;
+  /** Po upuszczeniu ducha przeglądarka wyśle jeszcze click — tłumimy go raz. */
+  private tlumKlik = false;
+  private porzucDnd: (() => void) | null = null;
 
   /** Referencje dla modułu ruchu (bez naruszania enkapsulacji metod). */
   get graRef(): Gra {
@@ -53,7 +57,32 @@ export class Kontroler {
   private wiazZdarzenia(): void {
     const { h } = this;
     h.klocki.forEach((btn, i) => {
-      btn.addEventListener('click', () => this.wybierz(i));
+      // Click po sesji DnD (pointerup generuje click) — ignorujemy raz.
+      btn.addEventListener('click', () => {
+        if (this.tlumKlik) {
+          this.tlumKlik = false;
+          return;
+        }
+        this.wybierz(i);
+      });
+    });
+    this.porzucDnd = podepnijDnd(h, () => this.gra, {
+      upusc: (slot, r, c) => {
+        this.tlumKlik = true;
+        this.wybrany = slot;
+        this.odswiezRef();
+        void wykonajRuch(this, r, c);
+      },
+      czyMozna: (slot) => {
+        if (this.zajety || this.gra.koniec) return false;
+        const s = this.gra.trojka[slot];
+        return !!s && !s.zuzyty && maRuch(this.gra.plansza, s.klocek);
+      },
+      poSesji: (przeciagnieto) => {
+        if (przeciagnieto) this.tlumKlik = true; // pointerup mógł wygenerować click
+        this.odswiezRef();
+        this.autoRef();
+      },
     });
     for (let r = 0; r < ROZMIAR; r++) {
       for (let c = 0; c < ROZMIAR; c++) {
@@ -79,9 +108,11 @@ export class Kontroler {
   }
 
   private nowaGra(): void {
+    this.porzucDnd?.();
     this.gra.odNowa();
     this.wybrany = null;
     this.zajety = false;
+    this.tlumKlik = false;
     this.h.koniecNakladka.classList.add('ukryty');
     this.odswiez();
     powiedz(this.h, 'Nowa gra! Wybierz klocek, potem pole.');

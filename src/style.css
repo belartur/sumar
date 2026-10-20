@@ -134,7 +134,13 @@ body {
 }
 
 .pole.puste:hover { border-color: var(--dobry); transform: scale(1.04); }
-.pole.zajete { cursor: default; background: #fff; }
+.pole.zajete {
+  cursor: default;
+  background: linear-gradient(145deg, #ffe9a8, #ffcf5c);
+  border-color: #b97b00;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.65), inset 0 -3px 0 rgba(150, 90, 0, 0.25);
+}
+.pole.zajete .oczek i.on { background: #4a2c00; }
 .pole.cel-podswietlenie { outline: 3px solid var(--dobry); }
 .pole.podglad-ok { background: #d8f3dc; border-color: var(--dobry); transform: scale(1.05); }
 .pole.podglad-zle { background: #ffe5d9; border-color: var(--zly); }
@@ -153,6 +159,18 @@ body {
 .oczek { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; height: 100%; }
 .oczek i { border-radius: 50%; }
 .oczek i.on { background: var(--tekst); box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.4); }
+/* Zero oczek: wyraźny pusty pierścień, żeby klocek nie znikał na tle pustego pola. */
+.oczek.zero { position: relative; }
+.oczek.zero::after {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border: 3px solid currentcolor;
+  border-radius: 50%;
+  opacity: 0.75;
+}
+.pole.zajete .oczek.zero { color: #7a4d00; }
+.klocek .polowka .oczek.zero { color: #2a6f65; }
 
 .trojka { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .klocek {
@@ -225,6 +243,33 @@ body {
 .karta ul { text-align: left; }
 
 .ukryty { display: none !important; }
+
+/* Przeciąganie klocka */
+.klocek { touch-action: none; }
+.klocek.ciagniety { opacity: 0.45; }
+body.dnd-aktywne { user-select: none; }
+body.dnd-aktywne .plansza { cursor: grabbing; }
+.duch {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.94;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+}
+.duch-polowki { display: flex; gap: 5px; }
+.duch-polowki.pion { flex-direction: column; }
+.duch-polowka {
+  width: 44px;
+  height: 44px;
+  background: #fffdf4;
+  border: 3px solid var(--akcent);
+  border-radius: 9px;
+  padding: 5px;
+}
+.duch.dobry .duch-polowka { border-color: var(--dobry); }
+.duch.zly .duch-polowka { border-color: var(--zly); }
 
 @media (min-width: 560px) {
   .klocek .polowka { width: 46px; height: 46px; }
