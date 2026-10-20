@@ -28,9 +28,7 @@ export function zrobDucha(klocek: Klocek): HTMLElement {
   return d;
 }
 
-/** Kotwica ducha = pierwsza połówka; duch wisi tak, by palec nie zasłaniał celu. */
-export function ustawDucha(duch: HTMLElement, x: number, y: number, pion: boolean): void {
-  const dx = pion ? 10 : -duch.offsetWidth / 2;
-  const dy = -duch.offsetHeight - 18;
-  duch.style.transform = `translate(${Math.round(x + dx)}px, ${Math.round(y + dy)}px)`;
+/** Duch wyśrodkowany na kursorze/palcu — tak samo dla klocków H i V. */
+export function ustawDucha(duch: HTMLElement, x: number, y: number): void {
+  duch.style.transform = `translate(${Math.round(x - duch.offsetWidth / 2)}px, ${Math.round(y - duch.offsetHeight / 2)}px)`;
 }

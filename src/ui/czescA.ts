@@ -6,8 +6,6 @@ export interface SzkieletA {
   punkty: HTMLElement;
   tura: HTMLElement;
   rekord: HTMLElement;
-  komunikat: HTMLElement;
-  bonus: HTMLElement;
   sumyKolumn: HTMLElement[];
 }
 
@@ -38,12 +36,6 @@ export function czescA(korzen: HTMLElement): SzkieletA {
   const punkty = mk('PUNKTY', true);
   const tura = mk('TURA', false);
   const rekord = mk('REKORD', false);
-  const komunikat = document.createElement('div');
-  komunikat.className = 'komunikat';
-  komunikat.setAttribute('role', 'status');
-  komunikat.textContent = 'Wybierz klocek, potem pole na planszy.';
-  const bonus = document.createElement('div');
-  bonus.className = 'komunikat ukryty';
   const pasek = document.createElement('div');
   pasek.style.cssText = 'display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center;';
   const rog = document.createElement('div');
@@ -60,7 +52,7 @@ export function czescA(korzen: HTMLElement): SzkieletA {
     sumyKolumn.push(s);
   }
   pasek.append(rog, rzad);
-  w.append(gora, komunikat, bonus, pasek);
+  w.append(gora, pasek);
   korzen.appendChild(w);
-  return { w, punkty, tura, rekord, komunikat, bonus, sumyKolumn };
+  return { w, punkty, tura, rekord, sumyKolumn };
 }

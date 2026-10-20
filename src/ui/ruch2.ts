@@ -2,8 +2,9 @@
 import type { Plansza } from '../engine/model.ts';
 import { czyLegalny, klonujPlansze, polaKlocka, sumyLinii } from '../engine/rules.ts';
 import type { Kontroler } from './kontroler.ts';
-import { rysujPlansze, powiedz, pokazBonus } from './rysuj.ts';
+import { rysujPlansze, potrzasnij } from './rysuj.ts';
 import { animujKaskade } from './anim.ts';
+import { plusNaPlanszy } from './plus.ts';
 import { wyczyscPodglad, malujPodglad } from './podglad.ts';
 import { zapiszWynik } from './rekord.ts';
 import { dzwiekPostawienia, dzwiekCzyszczenia, dzwiekKonca, dzwiekRekordu } from './dzwiek.ts';
@@ -13,15 +14,14 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
   const h = k.hRef;
   if (k.zajetyRef || g.koniec) return;
   if (k.wybranyRef === null) {
-    powiedz(h, 'Najpierw wybierz klocek z trójki.');
-    return;
+    return; // brak wyboru: klik pola bez klocka to no-op
   }
   const slot = k.wybranyRef;
   const klocek = g.trojka[slot]?.klocek;
   if (!klocek) return;
   if (!czyLegalny(g.plansza, klocek, r, c)) {
     malujPodglad(h, g, slot, r, c);
-    powiedz(h, 'Tu nie pasuje — oba pola muszą być puste.');
+    potrzasnij(h.pola[r][c]);
     return;
   }
   k.zajetyRef = true;
@@ -51,18 +51,12 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
   h.pola[p1.r][p1.c].classList.add('wpada');
   h.pola[p2.r][p2.c].classList.add('wpada');
 
-  // 2) Kaskada poziom po poziomie.
+  // 2) Kaskada poziom po poziomie + pływające „+N" nad środkiem zdjęć.
   if (wynik.liczbaPoziomow > 0) {
     dzwiekCzyszczenia(wynik.liczbaPoziomow);
+    const srodek = wynik.poziomy[0].zdjete;
     await animujKaskade(h, poPostawieniu, wynik.poziomy, rysujTlo);
-    const opis =
-      wynik.liczbaPoziomow > 1
-        ? `Kaskada ×${wynik.liczbaPoziomow}! +${wynik.punkty} pkt (L=${wynik.linieStart}).`
-        : `Zniknęło linii: ${wynik.linieStart}. +${wynik.punkty} pkt!`;
-    pokazBonus(h, opis);
-    powiedz(h, opis);
-  } else {
-    powiedz(h, wynik.trojkaWyczerpana ? `Trójka wyczerpana — tura ${g.tura}.` : 'Postaw kolejny klocek z trójki.');
+    plusNaPlanszy(h, wynik.punkty, srodek);
   }
 
   k.zajetyRef = false;
@@ -90,5 +84,4 @@ function zakoncz(k: Kontroler): void {
   }
   h.rekord.textContent = String(Math.max(k.rekordRef, g.punkty));
   h.koniecNakladka.classList.remove('ukryty');
-  powiedz(h, 'Koniec gry — żaden klocek nie ma ruchu.');
 }

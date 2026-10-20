@@ -9,8 +9,6 @@ export interface Uchwyty {
   punkty: HTMLElement;
   tura: HTMLElement;
   rekord: HTMLElement;
-  komunikat: HTMLElement;
-  bonus: HTMLElement;
   btnNowa: HTMLButtonElement;
   btnZasady: HTMLButtonElement;
   btnDzwiek: HTMLButtonElement;

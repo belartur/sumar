@@ -25,7 +25,7 @@ const KROPKI: Record<number, Array<[number, number]>> = {
 /** Tworzy element pola z oczkami (div.oczek > 9 komórek z kropkami). */
 export function elOczek(wartosc: number): HTMLElement {
   const el = document.createElement('div');
-  el.className = 'oczek' + (wartosc === 0 ? ' zero' : '');
+  el.className = 'oczek';
   el.dataset.v = String(wartosc);
   const kropki = KROPKI[wartosc] ?? [];
   for (let r = 0; r < 3; r++) {

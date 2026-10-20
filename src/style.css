@@ -31,6 +31,15 @@ body {
 
 .sumar { display: flex; flex-direction: column; gap: 10px; }
 
+/* Potrząśnięcie przy nieudanym ruchu (zamiast paska z tekstem) */
+@keyframes trzask {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+.trzask { animation: trzask 0.3s ease; }
+
 .gora {
   display: flex;
   align-items: center;
@@ -62,24 +71,6 @@ body {
 .licznik.wyrozniony { border-color: var(--akcent); }
 .licznik.wyrozniony strong { color: var(--akcent); }
 
-.komunikat {
-  min-height: 2.1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-weight: 600;
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
-  padding: 6px 10px;
-}
-
-.komunikat.wyskakuj { animation: wyskakuj 0.35s ease; }
-@keyframes wyskakuj {
-  0% { transform: scale(0.96); }
-  60% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
 /* cd. plansza + klocki + panele */
 
 .scena {
@@ -159,18 +150,6 @@ body {
 .oczek { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; height: 100%; }
 .oczek i { border-radius: 50%; }
 .oczek i.on { background: var(--tekst); box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.4); }
-/* Zero oczek: wyraźny pusty pierścień, żeby klocek nie znikał na tle pustego pola. */
-.oczek.zero { position: relative; }
-.oczek.zero::after {
-  content: "";
-  position: absolute;
-  inset: 22%;
-  border: 3px solid currentcolor;
-  border-radius: 50%;
-  opacity: 0.75;
-}
-.pole.zajete .oczek.zero { color: #7a4d00; }
-.klocek .polowka .oczek.zero { color: #2a6f65; }
 
 .trojka { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .klocek {
@@ -243,6 +222,31 @@ body {
 
 .ukryty { display: none !important; }
 
+/* Pływające „+N" za czyszczenie linii */
+.plansza-obramowanie { position: relative; }
+.plus-punkty {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 2rem;
+  color: #0f3d2e;
+  background: var(--pelna);
+  border: 3px solid #4a2c00;
+  border-radius: 999px;
+  padding: 2px 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  animation: plus-unosi-sie 1.3s ease-out forwards;
+}
+@keyframes plus-unosi-sie {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.5); }
+  15% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  30% { transform: translate(-50%, -55%) scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -160%) scale(1.05); }
+}
+
 /* Przeciąganie klocka */
 .klocek { touch-action: none; }
 .klocek.ciagniety { opacity: 0.45; }
@@ -275,4 +279,5 @@ body.dnd-aktywne .plansza { cursor: grabbing; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .plus-punkty { animation: none; opacity: 1; }
 }

@@ -82,8 +82,7 @@ export function podepnijDnd(h: Uchwyty, gra: () => Gra, z: ZaczepyDnD): () => vo
       document.body.classList.add('dnd-aktywne');
     }
     if (sesja.duch) {
-      const klocek = g.trojka[sesja.slot]?.klocek;
-      ustawDucha(sesja.duch, e.clientX, e.clientY, klocek?.ori === 'V');
+      ustawDucha(sesja.duch, e.clientX, e.clientY);
     }
     const kom = komorkaSpod(h, e.clientX, e.clientY);
     sesja.nad = kom !== null;

@@ -4,7 +4,7 @@ import { Gra } from '../engine/game.ts';
 import { maRuch, sumyLinii } from '../engine/rules.ts';
 import { zbudujWidok } from './czescC.ts';
 import type { Uchwyty } from './uchwyty.ts';
-import { rysujPlansze, rysujTrojke, powiedz } from './rysuj.ts';
+import { rysujPlansze, rysujTrojke, potrzasnij } from './rysuj.ts';
 import { wyczyscPodglad, malujPodglad } from './podglad.ts';
 import { wczytajRekord } from './rekord.ts';
 import { przelaczWyciszenie, czyWyciszony } from './dzwiek.ts';
@@ -115,7 +115,6 @@ export class Kontroler {
     this.tlumKlik = false;
     this.h.koniecNakladka.classList.add('ukryty');
     this.odswiez();
-    powiedz(this.h, 'Nowa gra! Wybierz klocek, potem pole.');
     this.autoWybierz();
   }
 
@@ -154,7 +153,7 @@ export class Kontroler {
     const s = this.gra.trojka[i];
     if (!s || s.zuzyty) return;
     if (!maRuch(this.gra.plansza, s.klocek)) {
-      powiedz(this.h, `Klocek ${i + 1} nie ma już ruchu — wybierz inny.`);
+      potrzasnij(this.h.klocki[i]);
       return;
     }
     this.wybrany = this.wybrany === i ? null : i;

@@ -1,4 +1,4 @@
-// Sumar — rysowanie trójki i komunikatów.
+// Sumar — rysowanie trójki.
 import type { Klocek } from '../engine/model.ts';
 import { elOczek } from './oczka.ts';
 import type { Uchwyty } from './uchwyty.ts';
@@ -30,16 +30,9 @@ export function rysujTrojke(
   });
 }
 
-export function powiedz(h: Uchwyty, tekst: string): void {
-  h.komunikat.textContent = tekst;
-  h.komunikat.classList.remove('wyskakuj');
-  void h.komunikat.offsetWidth;
-  h.komunikat.classList.add('wyskakuj');
-}
-
-export function pokazBonus(h: Uchwyty, tekst: string): void {
-  h.bonus.textContent = tekst;
-  h.bonus.classList.remove('ukryty');
-  window.clearTimeout((h as unknown as { _bt?: number })._bt);
-  (h as unknown as { _bt?: number })._bt = window.setTimeout(() => h.bonus.classList.add('ukryty'), 2200);
+/** Potrząśnięcie elementem (np. nielegalne pole lub klocek bez ruchu). */
+export function potrzasnij(el: HTMLElement): void {
+  el.classList.remove('trzask');
+  void el.offsetWidth;
+  el.classList.add('trzask');
 }
