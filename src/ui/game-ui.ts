@@ -1,11 +1,13 @@
 import { canPlace, cloneBoard, legalMoves } from '../game/board';
 import { newGame, placeTile } from '../game/game';
-import type { Board, GameState } from '../game/types';
+import type { Board, GameState, Tile } from '../game/types';
 import { BOARD_SIZE } from '../game/types';
 import { createFace } from './pips';
 import { loadRecord, saveRecord } from './records';
 
 const ANIM_MS = 350;
+/** Próg w pikselach, po którym ruch palcem/myszą zmienia tap w przeciąganie. */
+const DRAG_THRESHOLD = 8;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -13,13 +15,25 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Kontroler UI: render planszy/ręki, wybór klocka, podgląd, animacje kaskady.
- * Input: tap/klik na klocek → wybór; tap/klik na planszę → postawienie.
+ * Input: przeciągnięcie klocka z ręki na planszę (drag & drop, mysz/dotyk);
+ * tap/klik na klocek → wybór; tap/klik na planszę → postawienie.
  * Podgląd (hover) działa też na desktopie.
  */
 export class GameUI {
   private state: GameState = newGame();
   private selectedIndex: number | null = null;
   private busy = false;
+
+  // Stan przeciągania klocka z ręki na planszę
+  private dragIndex: number | null = null;
+  private dragPointerId: number | null = null;
+  private dragEngaged = false;
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private dragSourceEl: HTMLElement | null = null;
+  /** Czy klik wywołany przez przeglądarkę po tapnięciu/przeciągnięciu pominąć. */
+  private suppressClick = false;
+  private readonly dragEl: HTMLElement;
 
   private readonly boardEl: HTMLElement;
   private readonly handEl: HTMLElement;
@@ -61,6 +75,12 @@ export class GameUI {
     this.overlayEl = root.querySelector('#overlay')!;
     root.querySelector<HTMLButtonElement>('#new-game')!.addEventListener('click', () => this.restart());
 
+    // Pływający klocek widoczny podczas przeciągania (wisi poza #app).
+    this.dragEl = document.createElement('div');
+    this.dragEl.className = 'drag-ghost';
+    this.dragEl.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(this.dragEl);
+
     this.buildBoard();
     this.renderAll();
     this.updateHint();
@@ -90,7 +110,7 @@ export class GameUI {
     this.scoreEl.textContent = String(this.state.score);
     this.recordEl.textContent = String(loadRecord());
     this.turnEl.textContent = String(this.state.turn);
-    this.updateHighlights();
+    this.updateHighlights(this.selectedTile());
   }
 
   private renderBoard(board: Board): void {
@@ -115,7 +135,16 @@ export class GameUI {
       if (index === this.selectedIndex) btn.classList.add('selected');
       btn.append(createFace(tile.a), createFace(tile.b));
       btn.setAttribute('aria-label', `Klocek ${tile.a}-${tile.b}`);
-      btn.addEventListener('click', () => this.onTile(index));
+      btn.addEventListener('pointerdown', (e) => this.onTilePointerDown(e, index));
+      btn.addEventListener('pointermove', (e) => this.onTilePointerMove(e));
+      btn.addEventListener('pointerup', (e) => this.onTilePointerUp(e));
+      btn.addEventListener('pointercancel', (e) => this.onTilePointerCancel(e));
+      // Klik zostaje wyłącznie dla klawiatury (Enter/Spacja); po tapnięciu
+      // lub przeciągnięciu pointerup już obsłużył interakcję.
+      btn.addEventListener('click', () => {
+        if (this.suppressClick) return;
+        this.onTile(index);
+      });
       this.handEl.appendChild(btn);
     });
   }
@@ -126,7 +155,7 @@ export class GameUI {
     if (this.busy) return;
     this.selectedIndex = this.selectedIndex === index ? null : index;
     this.renderHand();
-    this.updateHighlights();
+    this.updateHighlights(this.selectedTile());
     this.updateHint();
   }
 
@@ -134,11 +163,11 @@ export class GameUI {
     if (this.busy || this.selectedIndex === null) return;
     const tile = this.state.hand[this.selectedIndex];
     if (!tile || !canPlace(this.state.board, tile, r, c)) return;
-    void this.placeSelected(r, c);
+    void this.placeSelected(this.selectedIndex, r, c);
   }
 
   private onHover(r: number | null, c: number | null): void {
-    if (this.busy || this.selectedIndex === null) {
+    if (this.busy || this.dragIndex !== null || this.selectedIndex === null) {
       this.clearGhost();
       return;
     }
@@ -147,6 +176,15 @@ export class GameUI {
       this.clearGhost();
       return;
     }
+    this.showGhost(tile, r, c);
+  }
+
+  private selectedTile(): Tile | null {
+    return this.selectedIndex === null ? null : (this.state.hand[this.selectedIndex] ?? null);
+  }
+
+  /** Podświetla docelowe pola i rysuje w nich podgląd klocka. */
+  private showGhost(tile: Tile, r: number, c: number): void {
     this.clearGhost();
     const cells = tile.orientation === 'h' ? [[r, c], [r, c + 1]] : [[r, c], [r + 1, c]];
     const values = [tile.a, tile.b];
@@ -169,14 +207,46 @@ export class GameUI {
     }
   }
 
-  /** Podświetla legalne pola startowe dla wybranego klocka. */
-  private updateHighlights(): void {
+  /** Podświetla legalne pola startowe dla danego klocka. */
+  private updateHighlights(tile: Tile | null): void {
     for (const cell of this.cells) cell.classList.remove('legal');
-    if (this.selectedIndex === null) return;
-    const tile = this.state.hand[this.selectedIndex];
     if (!tile) return;
     for (const { r, c } of legalMoves(this.state.board, tile)) {
       this.cells[r * BOARD_SIZE + c].classList.add('legal');
+    }
+  }
+
+  // ---------- przeciąganie klocka ----------
+
+  private onTilePointerDown(e: PointerEvent, index: number): void {
+    if (this.busy || e.button !== 0) return;
+    this.suppressClick = false;
+    this.dragIndex = index;
+    this.dragPointerId = e.pointerId;
+    this.dragEngaged = false;
+    this.dragStartX = e.clientX;
+    this.dragStartY = e.clientY;
+    this.dragSourceEl = e.currentTarget as HTMLElement;
+    // Capture sprawia, że move/up dostajemy też poza klockiem.
+    this.dragSourceEl.setPointerCapture(e.pointerId);
+  }
+
+  private onTilePointerMove(e: PointerEvent): void {
+    if (this.dragIndex === null || e.pointerId !== this.dragPointerId) return;
+    if (!this.dragEngaged) {
+      if (Math.hypot(e.clientX - this.dragStartX, e.clientY - this.dragStartY) < DRAG_THRESHOLD) {
+        return;
+      }
+      this.engageDrag();
+    }
+    this.dragEl.style.left = `${e.clientX}px`;
+    this.dragEl.style.top = `${e.clientY}px`;
+    const tile = this.state.hand[this.dragIndex];
+    const cell = this.cellFromPoint(e.clientX, e.clientY);
+    if (tile && cell && canPlace(this.state.board, tile, cell.r, cell.c)) {
+      this.showGhost(tile, cell.r, cell.c);
+    } else {
+      this.clearGhost();
     }
   }
 
@@ -186,16 +256,95 @@ export class GameUI {
       return;
     }
     this.hintEl.textContent = this.selectedIndex === null
-      ? 'Wybierz klocek z trójki poniżej.'
+      ? 'Przeciągnij klocek na planszę albo dotknij go, a potem pola.'
       : 'Dotknij podświetlonego pola, aby postawić klocek.';
+  }
+
+  private onTilePointerUp(e: PointerEvent): void {
+    if (this.dragIndex === null || e.pointerId !== this.dragPointerId) return;
+    const index = this.dragIndex;
+    const engaged = this.dragEngaged;
+    const tile = this.state.hand[index];
+    this.endDrag();
+    this.markClickSuppressed();
+    const cell = engaged ? this.cellFromPoint(e.clientX, e.clientY) : null;
+    if (engaged && tile && cell && canPlace(this.state.board, tile, cell.r, cell.c)) {
+      void this.placeSelected(index, cell.r, cell.c);
+      return;
+    }
+    // Upuszczono poza planszą → zaznacz klocek; zwykły tap → przełącz wybór.
+    this.selectedIndex = engaged || this.selectedIndex !== index ? index : null;
+    this.renderHand();
+    this.updateHighlights(this.selectedTile());
+    this.updateHint();
+  }
+
+  private onTilePointerCancel(e: PointerEvent): void {
+    if (this.dragIndex === null || e.pointerId !== this.dragPointerId) return;
+    this.endDrag();
+    this.markClickSuppressed();
+    this.updateHighlights(this.selectedTile());
+    this.updateHint();
+  }
+
+  private engageDrag(): void {
+    this.dragEngaged = true;
+    const tile = this.dragIndex === null ? null : this.state.hand[this.dragIndex];
+    if (!tile) return;
+    this.dragSourceEl?.classList.add('dragging');
+    this.dragEl.replaceChildren(createFace(tile.a), createFace(tile.b));
+    this.dragEl.classList.toggle('vertical', tile.orientation === 'v');
+    this.dragEl.classList.add('visible');
+    this.updateHighlights(tile);
+  }
+
+  private endDrag(): void {
+    if (this.dragSourceEl && this.dragPointerId !== null) {
+      try {
+        this.dragSourceEl.releasePointerCapture(this.dragPointerId);
+      } catch {
+        // capture mógł zostać już zwolniony (np. po pointercancel)
+      }
+    }
+    this.dragSourceEl?.classList.remove('dragging');
+    this.dragSourceEl = null;
+    this.dragIndex = null;
+    this.dragPointerId = null;
+    this.dragEngaged = false;
+    this.dragEl.classList.remove('visible');
+    this.clearGhost();
+  }
+
+  /**
+   * Po tapnięciu/przeciągnięciu przeglądarka wyemituje jeszcze klik —
+   * tłumimy go na chwilę (pointerdown kasuje flagę, więc kolejny tap działa).
+   */
+  private markClickSuppressed(): void {
+    this.suppressClick = true;
+    setTimeout(() => {
+      this.suppressClick = false;
+    }, 400);
+  }
+
+  /** Zwraca pole planszy pod danym punktem ekranu (null — poza planszą). */
+  private cellFromPoint(x: number, y: number): { r: number; c: number } | null {
+    const boardRect = this.boardEl.getBoundingClientRect();
+    if (x < boardRect.left || y < boardRect.top || x > boardRect.right || y > boardRect.bottom) {
+      return null;
+    }
+    const firstRect = this.cells[0].getBoundingClientRect();
+    const pitchX = this.cells[1].getBoundingClientRect().left - firstRect.left;
+    const pitchY = this.cells[BOARD_SIZE].getBoundingClientRect().top - firstRect.top;
+    const c = Math.min(BOARD_SIZE - 1, Math.max(0, Math.floor((x - firstRect.left) / pitchX)));
+    const r = Math.min(BOARD_SIZE - 1, Math.max(0, Math.floor((y - firstRect.top) / pitchY)));
+    return { r, c };
   }
 
   // ---------- ruch i animacje ----------
 
-  private async placeSelected(r: number, c: number): Promise<void> {
-    const index = this.selectedIndex;
-    if (index === null) return;
+  private async placeSelected(index: number, r: number, c: number): Promise<void> {
     const tile = this.state.hand[index];
+    if (!tile) return;
     const result = placeTile(this.state, index, r, c);
     if (!result) return;
 

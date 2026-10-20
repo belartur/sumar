@@ -175,9 +175,17 @@ body {
   background: var(--panel);
   border: 2px solid transparent;
   border-radius: 12px;
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
-  touch-action: manipulation;
+  cursor: grab;
+  transition: border-color 0.15s, transform 0.1s, opacity 0.15s;
+  touch-action: none; /* przeciąganie klocka zamiast przewijania strony */
+}
+
+.tile:active {
+  cursor: grabbing;
+}
+
+.tile.dragging {
+  opacity: 0.35;
 }
 
 .tile.vertical {
@@ -200,6 +208,45 @@ body {
 .tile:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* ---------- przeciągany klocek ---------- */
+
+.drag-ghost {
+  position: fixed;
+  z-index: 20;
+  display: none;
+  gap: 4px;
+  padding: 8px;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1.06);
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.45));
+}
+
+.drag-ghost.visible {
+  display: flex;
+}
+
+.drag-ghost.vertical {
+  flex-direction: column;
+}
+
+.drag-ghost .face {
+  width: 34px;
+  height: 34px;
+  padding: 4px;
+  background: var(--cell);
+  border-radius: 8px;
+}
+
+/* Palcem klocek trzymamy nieco wyżej, żeby nie zasłaniał celu. */
+@media (pointer: coarse) {
+  .drag-ghost {
+    transform: translate(-50%, -165%) scale(1.06);
+  }
 }
 
 /* ---------- popup punktów ---------- */
@@ -287,7 +334,8 @@ body {
   .topbar h1 {
     font-size: 1.1rem;
   }
-  .tile .face {
+  .tile .face,
+  .drag-ghost .face {
     width: 28px;
     height: 28px;
   }
