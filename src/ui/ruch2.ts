@@ -2,28 +2,20 @@
 import type { Plansza } from '../engine/model.ts';
 import { czyLegalny, klonujPlansze, polaKlocka, sumyLinii } from '../engine/rules.ts';
 import type { Kontroler } from './kontroler.ts';
-import { rysujPlansze, potrzasnij } from './rysuj.ts';
+import { rysujPlansze } from './rysuj.ts';
 import { animujKaskade } from './anim.ts';
 import { plusCzystaPlansza, plusPrzyrostowy, plusKoniecRuchu } from './plus.ts';
-import { wyczyscPodglad, malujPodglad } from './podglad.ts';
+import { wyczyscPodglad } from './podglad.ts';
 import { zapiszWynik } from './rekord.ts';
 import { dzwiekPostawienia, dzwiekCzyszczenia, dzwiekKonca, dzwiekRekordu } from './dzwiek.ts';
 
-export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<void> {
+export async function wykonajRuch(k: Kontroler, slot: number, r: number, c: number): Promise<void> {
   const g = k.graRef;
   const h = k.hRef;
   if (k.zajetyRef || g.koniec) return;
-  if (k.wybranyRef === null) {
-    return; // brak wyboru: klik pola bez klocka to no-op
-  }
-  const slot = k.wybranyRef;
   const klocek = g.trojka[slot]?.klocek;
   if (!klocek) return;
-  if (!czyLegalny(g.plansza, klocek, r, c)) {
-    malujPodglad(h, g, slot, r, c);
-    potrzasnij(h.pola[r][c]);
-    return;
-  }
+  if (!czyLegalny(g.plansza, klocek, r, c)) return;
   k.zajetyRef = true;
   wyczyscPodglad(h);
   dzwiekPostawienia();
@@ -43,7 +35,6 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
   };
 
   const wynik = g.postaw(slot, r, c);
-  k.wybranyRef = null;
 
   const rysujTlo = (p: Plansza): void => {
     const s = sumyLinii(p);
@@ -76,10 +67,7 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
 
   k.zajetyRef = false;
   if (wynik.koniecGry) zakoncz(k);
-  else {
-    k.odswiezRef();
-    k.autoRef();
-  }
+  else k.odswiezRef();
 }
 
 function zakoncz(k: Kontroler): void {

@@ -7,8 +7,6 @@ export interface ZaczepyDnD {
   upusc: (slot: number, r: number, c: number) => void;
   /** Czy można teraz ruszać (brak animacji, gra trwa, klocek ruchomy). */
   czyMozna: (slot: number) => boolean;
-  /** Po zakończeniu sesji; dostaje true, gdy było to przeciągnięcie (nie tap). */
-  poSesji: (przeciagnieto: boolean) => void;
 }
 
 /** Pływający podgląd klocka za kursorem/palcem. */

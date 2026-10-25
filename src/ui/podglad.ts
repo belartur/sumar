@@ -1,4 +1,4 @@
-// Sumar — interakcje: wybór klocka + podgląd legalności na planszy.
+// Sumar — podgląd legalności pól podczas przeciągania klocka.
 import { ROZMIAR } from '../engine/model.ts';
 import { czyLegalny, polaKlocka } from '../engine/rules.ts';
 import type { Gra } from '../engine/game.ts';

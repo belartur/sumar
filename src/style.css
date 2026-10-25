@@ -34,15 +34,6 @@ body {
 
 .sumar { display: flex; flex-direction: column; gap: 10px; }
 
-/* Potrząśnięcie przy nieudanym ruchu (zamiast paska z tekstem) */
-@keyframes trzask {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-3px); }
-}
-.trzask { animation: trzask 0.3s ease; }
-
 .gora {
   display: flex;
   align-items: center;
@@ -122,12 +113,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   padding: 6%;
   transition: transform 0.08s ease, border-color 0.12s ease, background 0.12s ease;
 }
 
-.pole.puste:hover { border-color: var(--dobry); transform: scale(1.04); }
 .pole.zajete {
   cursor: default;
   background: linear-gradient(145deg, #ffe9a8, #ffcf5c);
@@ -192,7 +181,6 @@ body {
   background: var(--ujemne-tlo);
   border-color: var(--ujemne-obram);
 }
-.klocek.wybrany { border-color: var(--akcent); background: rgba(255, 183, 3, 0.16); transform: translateY(-2px); }
 .klocek.zuzyty { opacity: 0.35; cursor: default; }
 .klocek.bez-ruchu { opacity: 0.55; border-style: dashed; }
 .klocek:not(.zuzyty):hover { border-color: var(--krem); }

@@ -1,5 +1,5 @@
 // Sumar — przeciąganie, cz. 2: sesja Pointer Events na przyciskach trójki.
-// Tap (= brak ruchu) przepuszczamy do clicka; pociągnięcie (>8px) to sesja DnD.
+// Pociągnięcie (>8px) to sesja DnD; tap (= brak ruchu) kończy się bez akcji.
 import { ROZMIAR } from '../engine/model.ts';
 import { czyLegalny } from '../engine/rules.ts';
 import type { Gra } from '../engine/game.ts';
@@ -45,17 +45,13 @@ export function podepnijDnd(h: Uchwyty, gra: () => Gra, z: ZaczepyDnD): () => vo
     wyczyscPodglad(h);
     for (const b of h.klocki) b.classList.remove('ciagniety');
     document.body.classList.remove('dnd-aktywne');
-    if (!s.ruszone) return; // tap: click obsłuży wybór
+    if (!s.ruszone) return; // tap: bez akcji
     if (upusciony && s.nad) {
       const g = gra();
       const klocek = g.trojka[s.slot]?.klocek;
       if (klocek && czyLegalny(g.plansza, klocek, s.celR, s.celC)) {
         z.upusc(s.slot, s.celR, s.celC);
-      } else {
-        z.poSesji(true);
       }
-    } else {
-      z.poSesji(true);
     }
   };
 

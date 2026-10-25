@@ -6,7 +6,6 @@ import type { Uchwyty } from './uchwyty.ts';
 export function rysujTrojke(
   h: Uchwyty,
   t: Array<{ klocek: Klocek; zuzyty: boolean }>,
-  wybrany: number | null,
   ruchome: boolean[],
 ): void {
   t.forEach((s, i) => {
@@ -25,16 +24,7 @@ export function rysujTrojke(
       'aria-label',
       `Klocek ${i + 1}: ${etykietaWartosci(s.klocek.a)} i ${etykietaWartosci(s.klocek.b)}, ${kier}${s.zuzyty ? ', postawiony' : ''}`,
     );
-    btn.className =
-      'klocek' + (s.zuzyty ? ' zuzyty' : '') + (wybrany === i ? ' wybrany' : '') + (!s.zuzyty && !ruchome[i] ? ' bez-ruchu' : '');
+    btn.className = 'klocek' + (s.zuzyty ? ' zuzyty' : '') + (!s.zuzyty && !ruchome[i] ? ' bez-ruchu' : '');
     btn.disabled = s.zuzyty;
-    btn.setAttribute('aria-pressed', wybrany === i ? 'true' : 'false');
   });
-}
-
-/** Potrząśnięcie elementem (np. nielegalne pole lub klocek bez ruchu). */
-export function potrzasnij(el: HTMLElement): void {
-  el.classList.remove('trzask');
-  void el.offsetWidth;
-  el.classList.add('trzask');
 }
