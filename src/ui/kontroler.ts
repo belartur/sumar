@@ -6,7 +6,7 @@ import { zbudujWidok } from './czescC.ts';
 import type { Uchwyty } from './uchwyty.ts';
 import { rysujPlansze, rysujTrojke, potrzasnij } from './rysuj.ts';
 import { wyczyscPodglad, malujPodglad } from './podglad.ts';
-import { wczytajRekord } from './rekord.ts';
+import { wczytajRekord, zapiszWynik } from './rekord.ts';
 import { przelaczWyciszenie, czyWyciszony } from './dzwiek.ts';
 import { wykonajRuch } from './ruch2.ts';
 import { podepnijDnd } from './dnd.ts';
@@ -109,6 +109,8 @@ export class Kontroler {
   }
 
   private nowaGra(): void {
+    // Przerwana partia też może ustanowić rekord — zapisz go przed resetem.
+    if (zapiszWynik(this.gra.punkty)) this.rekord = this.gra.punkty;
     usunPlus();
     this.porzucDnd?.();
     this.gra.odNowa();
