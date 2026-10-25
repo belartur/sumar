@@ -20,7 +20,7 @@ export interface PodsumowanieRuchu extends WynikRuchu {
   koniecGry: boolean;
   /** N przed ruchem (liczba dotychczas wyczyszczonych plansz). */
   nCzystychPrzed: number;
-  /** Bonus za całkowite wyczyszczenie planszy (0 gdy brak). */
+  /** Bonus za całkowite wyczyszczenie planszy: 10×N (N = numer czyszczenia; 0 gdy brak). */
   bonusCzysta: number;
   /** Łączne punkty za ruch: linie + bonus za całą planszę. */
   punktyRazem: number;
@@ -92,7 +92,7 @@ export class Gra {
     const wynik = postawIPrzelicz(this.plansza, s.klocek, r, c);
     s.zuzyty = true;
     const nCzystychPrzed = this.wyczyszczonePlansze;
-    const bonusCzysta = wynik.czyCzystaPlansza ? bonusZaCalaPlansze(nCzystychPrzed) : 0;
+    const bonusCzysta = wynik.czyCzystaPlansza ? bonusZaCalaPlansze(nCzystychPrzed + 1) : 0;
     if (wynik.czyCzystaPlansza) this.wyczyszczonePlansze++;
     const punktyRazem = wynik.punkty + bonusCzysta;
     this.punkty += punktyRazem;

@@ -1,6 +1,6 @@
 // Sumar — pływające „+N" nad planszą (punkty za czyszczenie).
-// Dymki przyrostowe: po każdej kaskadzie pojawia się NOWY dymek z deltą
-// (A, B-A, C-B, …), które sumują się do punktów za cały ruch.
+// Dymki przyrostowe: po każdej kaskadzie pojawia się NOWY dymek z punktami
+// za dany poziom (p×l×2^k). Dymki sumują się do punktów za cały ruch.
 // Każdy dymek znika niezależnie ~1400ms po swoim pojawieniu,
 // nad środkiem pól zdjętych na SWOIM poziomie (z przesunięciem w pionie,
 // żeby kolejne dymki się nie nakładały).
@@ -64,6 +64,7 @@ export function plusCzystaPlansza(h: Uchwyty, bonus: number): void {
 /**
  * Nowy dymek przyrostowy po kolejnej kaskadzie: zawsze nowy element,
  * nigdy nie nadpisuje poprzednich — dymki sumują się do punktów za ruch.
+ * `delta` = punkty za dany poziom (p×l×2^k).
  * `ktory` = indeks poziomu w ruchu (0-bazowo), służy do przesunięcia w pionie.
  */
 export function plusPrzyrostowy(

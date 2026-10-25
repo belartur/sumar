@@ -61,7 +61,7 @@ export async function wykonajRuch(k: Kontroler, r: number, c: number): Promise<v
   h.pola[p2.r][p2.c].classList.add('wpada');
 
   // 2) Kaskada poziom po poziomie. Po każdej kaskadzie pojawia się NOWY dymek
-  // z deltą: A, B-A, C-B, … — dymki sumują się do punktów za cały ruch.
+  // z punktami za dany poziom (p×l×2^k) — dymki sumują się do punktów za cały ruch.
   // Każdy dymek nad środkiem pól zdjętych na SWOIM poziomie.
   if (wynik.liczbaPoziomow > 0) {
     dzwiekCzyszczenia(wynik.liczbaPoziomow);

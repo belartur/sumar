@@ -47,15 +47,18 @@ export function zbudujWidok(korzen: HTMLElement): Uchwyty {
 
 function punktyZasada(): DocumentFragment {
   const f = document.createDocumentFragment();
-  f.append('Punkty: (L×(L+1)/2) × 2');
+  f.append('Punkty: p×l×2');
   const sup = document.createElement('sup');
-  sup.textContent = 'K';
-  f.append(sup, '; L to sumaryczna liczba linii, K to sumaryczna liczba kaskad.');
+  sup.textContent = 'k';
+  f.append(
+    sup,
+    '; p to liczba unikalnych usuniętych pól, l to liczba usuniętych linii na danym poziomie, k to poziom kaskady (0, 1, 2…). Każdy poziom liczy się osobno.',
+  );
   return f;
 }
 
 function bonusZasada(): string {
-  return 'Całkowite wyczyszczenie planszy: bonus 5N+5 (N = liczba dotychczas wyczyszczonych, od 0).';
+  return 'Całkowite wyczyszczenie planszy: bonus 10×N, gdzie N to numer czyszczenia (1. → 10, 2. → 20, 3. → 30…).';
 }
 
 function czescNakladek(): Pick<

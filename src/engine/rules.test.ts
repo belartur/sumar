@@ -12,7 +12,7 @@ import {
   losujWartoscPolowki,
   polaKlocka,
   postawIPrzelicz,
-  punktyZaRuch,
+  punktyZaPoziom,
   pustaPlansza,
   sumyLinii,
 } from './rules.ts';
@@ -84,17 +84,18 @@ describe('sumy linii', () => {
 });
 
 describe('punktacja', () => {
-  it('nowy wzór: (L*(L+1)/2) * 2^K, L sumaryczne, K 0-bazowo', () => {
-    expect(punktyZaRuch(1, 0)).toBe(1);
-    expect(punktyZaRuch(2, 0)).toBe(3);
-    expect(punktyZaRuch(1, 1)).toBe(2);
-    expect(punktyZaRuch(2, 1)).toBe(6);
-    expect(punktyZaRuch(3, 2)).toBe(24);
+  it('wzór na poziom: p*l*2^k, k 0-bazowo', () => {
+    expect(punktyZaPoziom(3, 1, 0)).toBe(3);
+    expect(punktyZaPoziom(4, 2, 0)).toBe(8);
+    expect(punktyZaPoziom(3, 1, 1)).toBe(6);
+    expect(punktyZaPoziom(2, 1, 2)).toBe(8);
+    expect(punktyZaPoziom(2, 2, 2)).toBe(16);
   });
 
-  it('brak czyszczenia to 0 pkt', () => {
-    expect(punktyZaRuch(0, 0)).toBe(0);
-    expect(punktyZaRuch(0, 2)).toBe(0);
+  it('brak pól lub linii to 0 pkt', () => {
+    expect(punktyZaPoziom(0, 0, 0)).toBe(0);
+    expect(punktyZaPoziom(0, 2, 1)).toBe(0);
+    expect(punktyZaPoziom(3, 0, 2)).toBe(0);
   });
 });
 
@@ -172,7 +173,7 @@ describe('klocki ujemne', () => {
     const p = planszaZ([[3, 3, null, null, null]]);
     const w = postawIPrzelicz(p, { a: -1, b: 0, ori: 'H' }, 0, 2);
     expect(w.sumaLinii).toBe(1);
-    expect(w.punkty).toBe(1);
+    expect(w.punkty).toBe(4); // p=4 pola, l=1 linia, k=0
     expect(p[0].every((v) => v === null)).toBe(true);
   });
 
@@ -192,10 +193,10 @@ describe('całkowite czyszczenie planszy', () => {
     expect(czyPustaPlansza(p)).toBe(false);
   });
 
-  it('bonus 5N+5: N=0 → 5, N=1 → 10, N=2 → 15', () => {
-    expect(bonusZaCalaPlansze(0)).toBe(5);
+  it('bonus 10×N: numer czyszczenia 1 → 10, 2 → 20, 3 → 30', () => {
     expect(bonusZaCalaPlansze(1)).toBe(10);
-    expect(bonusZaCalaPlansze(2)).toBe(15);
+    expect(bonusZaCalaPlansze(2)).toBe(20);
+    expect(bonusZaCalaPlansze(3)).toBe(30);
   });
 
   it('ruch bez kaskady nie daje flagi czystej planszy', () => {
@@ -210,7 +211,7 @@ describe('całkowite czyszczenie planszy', () => {
     const p = planszaZ([[2, null, null, null, null]]);
     const w = postawIPrzelicz(p, { a: 0, b: 3, ori: 'H' }, 0, 1);
     expect(w.sumaLinii).toBe(1);
-    expect(w.punkty).toBe(1);
+    expect(w.punkty).toBe(3); // p=3 pola, l=1 linia, k=0
     expect(w.czyCzystaPlansza).toBe(true);
     expect(czyPustaPlansza(p)).toBe(true);
   });
@@ -224,7 +225,7 @@ describe('całkowite czyszczenie planszy', () => {
       [null, null, null, null, null],
     ]);
     const w = postawIPrzelicz(p, { a: 2, b: 3, ori: 'V' }, 1, 3);
-    expect(w.punkty).toBe(3);
+    expect(w.punkty).toBe(6); // p=3 pola, l=2 linie, k=0
     expect(w.czyCzystaPlansza).toBe(false);
   });
 });

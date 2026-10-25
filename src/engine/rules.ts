@@ -114,17 +114,20 @@ export function czyPustaPlansza(p: Plansza): boolean {
   return p.every((w) => w.every((v) => v === null));
 }
 
-/** Bonus za całkowite wyczyszczenie planszy: 5*N + 5, gdzie N = liczba dotychczas wyczyszczonych. */
-export function bonusZaCalaPlansze(nDotychczas: number): number {
-  const n = nDotychczas < 0 ? 0 : Math.floor(nDotychczas);
-  return 5 * n + 5;
+/** Bonus za N-te całkowite wyczyszczenie planszy: 10*N (N = numer czyszczenia, od 1). */
+export function bonusZaCalaPlansze(numerCzyszczenia: number): number {
+  const n = numerCzyszczenia < 1 ? 0 : Math.floor(numerCzyszczenia);
+  return 10 * n;
 }
 
-/** Punktacja ruchu: L = sumaryczna liczba linii, K = sumaryczna liczba kaskad (0-bazowo). */
-export function punktyZaRuch(sumaLinii: number, kaskady: number): number {
-  if (sumaLinii <= 0) return 0;
-  const k = kaskady < 0 ? 0 : kaskady;
-  return ((sumaLinii * (sumaLinii + 1)) / 2) * 2 ** k;
+/**
+ * Punkty za jeden poziom kaskady: p*l*2^k.
+ * p = liczba unikalnych usuniętych pól, l = liczba usuniętych linii, k = poziom (0-bazowo).
+ */
+export function punktyZaPoziom(pola: number, linie: number, poziom: number): number {
+  if (pola <= 0 || linie <= 0) return 0;
+  const k = poziom < 0 ? 0 : Math.floor(poziom);
+  return pola * linie * 2 ** k;
 }
 
 /**
@@ -157,20 +160,20 @@ export function postawIPrzelicz(p: Plansza, k: Klocek, r: number, c: number): Wy
   const linieStart = poziomy.length > 0 ? poziomy[0].wiersze.length + poziomy[0].kolumny.length : 0;
   const liczbaPoziomow = poziomy.length;
   const sumaLinii = poziomy.reduce((s, p) => s + p.wiersze.length + p.kolumny.length, 0);
-  // K = sumaryczna liczba kaskad (0-bazowo): sam poziom 0 → K = 0, każda kolejna kaskada +1.
+  // K = indeks ostatniego poziomu (0-bazowo): sam poziom 0 → K = 0, każda kolejna kaskada +1.
   const kaskady = liczbaPoziomow > 0 ? liczbaPoziomow - 1 : 0;
   const punktyPoPoziomach: number[] = [];
   const punktyPrzyrostowo: number[] = [];
-  let narastajaceL = 0;
-  let poprzednie = 0;
+  let sumaPunktow = 0;
   for (let i = 0; i < poziomy.length; i++) {
-    narastajaceL += poziomy[i].wiersze.length + poziomy[i].kolumny.length;
-    const kumulant = punktyZaRuch(narastajaceL, i);
-    punktyPoPoziomach.push(kumulant);
-    punktyPrzyrostowo.push(kumulant - poprzednie);
-    poprzednie = kumulant;
+    const p = poziomy[i].zdjete.length;
+    const l = poziomy[i].wiersze.length + poziomy[i].kolumny.length;
+    const punktyPoziomu = punktyZaPoziom(p, l, i);
+    sumaPunktow += punktyPoziomu;
+    punktyPrzyrostowo.push(punktyPoziomu);
+    punktyPoPoziomach.push(sumaPunktow);
   }
-  const punkty = punktyPoPoziomach.length > 0 ? punktyPoPoziomach[punktyPoPoziomach.length - 1] : 0;
+  const punkty = sumaPunktow;
   const czyCzystaPlansza = liczbaPoziomow > 0 && czyPustaPlansza(p);
   return { poziomy, sumaLinii, kaskady, liczbaPoziomow, linieStart, punkty, punktyPoPoziomach, punktyPrzyrostowo, czyCzystaPlansza };
 }

@@ -1,16 +1,14 @@
 // Sumar — rekord w localStorage (klucz odrębny od innych wersji).
-// v3: bonus za całkowite wyczyszczenie planszy (5N+5) — stare rekordy nieporównywalne.
-const KLUCZ = 'sumar-nowa:rekord:v3';
-const STARY_KLUCZ = 'sumar-nowa:rekord:v2';
-const STARY_KLUCZ_V1 = 'sumar-nowa:rekord:v1';
+// v4: nowa punktacja p×l×2^k i bonus 10×N — stare rekordy nieporównywalne.
+const KLUCZ = 'sumar-nowa:rekord:v4';
+const STARE_KLUCZE = ['sumar-nowa:rekord:v3', 'sumar-nowa:rekord:v2', 'sumar-nowa:rekord:v1'];
 
 export function wczytajRekord(): number {
   try {
     const surowe = localStorage.getItem(KLUCZ);
     // Ze względu na zmianę wzoru: przy pierwszym odczycie wyczyść stare rekordy.
     try {
-      localStorage.removeItem(STARY_KLUCZ);
-      localStorage.removeItem(STARY_KLUCZ_V1);
+      for (const stary of STARE_KLUCZE) localStorage.removeItem(stary);
     } catch {
       /* brak dostępu — gra działa dalej */
     }

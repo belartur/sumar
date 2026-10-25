@@ -86,24 +86,27 @@ Kaskada trwa, aż żadna linia nie ma sumy 5. Każdy kolejny poziom zwiększa mn
 
 ## 7. Punktacja
 
-Za **każde pojedyncze postawienie klocka** (a nie dopiero za całą trójkę):
+Za **każde pojedyncze postawienie klocka** (a nie dopiero za całą trójkę)
+punkty liczone są **osobno dla każdego poziomu kaskady**:
 
 ```
-punkty_ruchu = (L × (L + 1) / 2) × 2^K
+punkty_ruchu = Σ_k (p_k × l_k × 2^k)
 ```
 
-gdzie:
-- **L** — sumaryczna liczba linii (rzędów + kolumn) usuniętych we wszystkich poziomach,
-- **K** — sumaryczna liczba kaskad (0-bazowo: sam poziom 0 → K = 0, każda kolejna kaskada +1; ruch bez zniknięć daje 0 punktów),
-- **L × (L + 1) / 2** — *trójkątna baza*: 1 linia → 1, 2 linie → 3, 3 linie → 6…,
-- **2^K** — *mnożnik kaskady*: ×1 przy braku kaskady, ×2, ×4, ×8… przy coraz dłuższych seriach.
+gdzie dla poziomu **k** (0-bazowo: k = 0 to pierwsze czyszczenie, k = 1 to
+pierwsza kaskada, k = 2 to druga kaskada itd.):
+- **p_k** — liczba **unikalnych** pól usuniętych na tym poziomie (pole na
+  przecięciu usuwanego wiersza i kolumny liczy się raz),
+- **l_k** — liczba usuniętych linii na tym poziomie (wiersze + kolumny),
+- **2^k** — mnożnik kaskady: ×1, ×2, ×4, ×8…
 
-Po każdej kaskadzie gra pokazuje **osobny dymek** z punktami przyrostowymi:
-w pierwszym poziomie liczbę A (tak, jakby był tylko jeden poziom), w drugim
-różnicę B−A (gdzie B uwzględnia sumę punktów po drugim poziomie), w trzecim
-C−B itd. Dymki sumują się do punktów za cały ruch
-(A + (B−A) + (C−B) = C). Wynik sumaryczny (z całej gry) zmienia się dopiero
-po zakończonym ruchu.
+`p_k` i `l_k` są liczone **od nowa na każdym poziomie**. Ruch bez żadnego
+zniknięcia daje 0 punktów. Dzięki temu każdy poziom można policzyć niezależnie
+i po prostu dodać wyniki.
+
+Po każdej kaskadzie gra pokazuje **osobny dymek** z punktami za dany poziom
+(`p_k × l_k × 2^k`). Dymki sumują się do punktów za cały ruch. Wynik sumaryczny
+(z całej gry) zmienia się dopiero po zakończonym ruchu.
 
 ### Bonus za całkowite wyczyszczenie planszy
 
@@ -111,24 +114,24 @@ Gdy po postawieniu klocka i pełnej kaskadzie plansza jest w **100% pusta**
 (wszystkie 25 pól puste), gracz dostaje dodatkowy bonus:
 
 ```
-bonus = 5×N + 5
+bonus = 10×N
 ```
 
-gdzie **N** — liczba dotychczas całkowicie wyczyszczonych plansz w tej grze
-(od 0, reset przy nowej grze). Czyli 1. wyczyszczenie daje +5, 2. daje +10,
-3. daje +15 itd. Bonus dolicza się do punktów za linie z tego ruchu
-(łącznie: linie + bonus) i pokazywany jest osobnym dużym dymkiem
+gdzie **N** — numer całkowitego wyczyszczenia planszy w tej grze
+(N = 1, 2, 3, …; reset przy nowej grze). Czyli 1. wyczyszczenie daje +10,
+2. daje +20, 3. daje +30 itd. Bonus dolicza się do punktów za linie z tego
+ruchu (łącznie: linie + bonus) i pokazywany jest osobnym dużym dymkiem
 „+N CZYSTA!”. Licznik N (`CZYSTE`) jest zawsze widoczny na ekranie, od startu gry.
 
 ### Przykłady obliczeń
 
-| Ruch | L | K | Punkty | Wyliczenie |
+| Ruch | Poziom 0 | Poziom 1 | Poziom 2 | Razem |
 |---|---|---|---|---|
-| Czyści 1 wiersz, bez kaskady | 1 | 0 | **1** | 1 × 1 |
-| Czyści wiersz i kolumnę jednocześnie | 2 | 0 | **3** | 3 × 1 |
-| Kaskada 2 poziomy: najpierw 1 linia, po niej kolejna | 2 | 1 | **6** | 3 × 2 |
-| Kaskada: na starcie 2 linie, potem jeszcze 1 | 3 | 1 | **12** | 6 × 2 |
-| Trzy linie naraz + podwójna kaskada | 4 | 2 | **40** | 10 × 4 |
+| 1 linia, 3 pola, bez kaskady | 3×1×1 = **3** | — | — | **3** |
+| Wiersz + kolumna, 5 unikalnych pól | 5×2×1 = **10** | — | — | **10** |
+| Kaskada: 2 pola/1 linia, potem 3 pola/1 linia | 2×1×1 = **2** | 3×1×2 = **6** | — | **8** |
+| Kaskada: 4 pola/2 linie, potem 3 pola/1 linia | 4×2×1 = **8** | 3×1×2 = **6** | — | **14** |
+| Trzy poziomy: 2/1, 3/1, 2/2 | 2×1×1 = **2** | 3×1×2 = **6** | 2×2×4 = **16** | **24** |
 
 ## 8. Warunki końca gry
 
@@ -167,9 +170,9 @@ Kontrola sum przed ruchem: wiersze = 3, 3, 1, 3, 0; kolumny = 2, 3, 3, 0, 2 — 
 
 Sprawdzenie sum:
 - **Wiersz 2:** 3 + 2 = **5** → znika!
-- **Kolumna 4:** 2 + 3 = **5** → znika też! (L = 2)
+- **Kolumna 4:** 2 + 3 = **5** → znika też! (l = 2)
 - Pozostałe linie ≠ 5 (wiersz 3: 1 + 3 = 4).
-- Punkty za to postawienie (brak dalszej kaskady, K = 0): (2×3/2) × 2⁰ = 3 × 1 = **3**.
+- Punkty za to postawienie (brak dalszej kaskady, k = 0): usunięto **p = 3** unikalne pola, **l = 2** linie → 3 × 2 × 2⁰ = **6**.
 
 Po usunięciu wiersza 2 i kolumny 4:
 
@@ -199,11 +202,11 @@ Osobna sytuacja: kolumna 1 jest **przegrzona** (suma 7), a wiersz 2 ma sumę 2:
 
 **Ruch w trójce:** gracz ma trójkę, w której jest klocek `(3, 1)` z wylosowanym obrotem pionowym — stawia go **jako pierwszego** (spośród trzech) w kolumnie 2 (wiersze 2–3) → w wierszu 2 powstaje suma 2 + 3 = **5** → wiersz 2 znika:
 
-1. **Poziom 0:** znika wiersz 2 → z kolumny 1 ubywa pole o 2 oczkach → jej suma: 7 − 2 = **5**. L = 1, K = 0 → dymek **+1** (A).
+1. **Poziom 0 (k = 0):** znika wiersz 2 (p = 2 pola, l = 1 linia) → 2 × 1 × 2⁰ = **2 pkt** (dymek **+2**). Z kolumny 1 ubywa pole o 2 oczkach → jej suma: 7 − 2 = **5**.
    *(Po tym usunięciu: wiersz 3 = 1 + 1 = 2, kolumna 2 = 1, kolumna 4 = 0 — żadna inna linia nie równa się 5 poza kolumną 1.)*
-2. **Poziom 1 (kaskada):** kolumna 1 ma teraz sumę 5 → znika! L = 2, K = 1 → razem 6 pkt, więc drugi dymek to **+5** (B−A).
+2. **Poziom 1 (kaskada, k = 1):** kolumna 1 ma teraz sumę 5 → znika! p = 3 pola, l = 1 linia → 3 × 1 × 2¹ = **6 pkt** (dymek **+6**).
 
-Punkty: (2×3/2) × 2^1 = 3 × 2 = **6** (dymki: +1, +5).
+Punkty: 2 + 6 = **8** (dymki: +2, +6).
 
 To pokazuje pełną pętlę: przegrzana linia (7) → odmrożenie przez zniknięcie przecinającego wiersza → natychmiastowa kaskada i podwojone punkty.
 

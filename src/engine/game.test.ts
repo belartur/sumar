@@ -65,7 +65,7 @@ describe('Gra (tury i koniec)', () => {
     expect(g.wyczyszczonePlansze).toBe(0);
   });
 
-  it('pełne wyczyszczenie: bonus 5 przy N=0, N rośnie, punkty sumują linie+bonus', () => {
+  it('pełne wyczyszczenie: bonus 10 za 1. raz, N rośnie, punkty sumują linie+bonus', () => {
     const g = new Gra(stalyLos(0.0));
     g.odNowa();
     // Plansza: tylko [2] w (0,0); trójkę podmieniamy na sterowalną.
@@ -78,15 +78,15 @@ describe('Gra (tury i koniec)', () => {
     const s = g.postaw(0, 0, 1);
     expect(s.czyCzystaPlansza).toBe(true);
     expect(s.nCzystychPrzed).toBe(0);
-    expect(s.bonusCzysta).toBe(5);
-    // Linie: 1 → 1 pkt + bonus 5 = 6 razem.
-    expect(s.punkty).toBe(1);
-    expect(s.punktyRazem).toBe(6);
-    expect(g.punkty).toBe(6);
+    expect(s.bonusCzysta).toBe(10);
+    // Linie: p=3, l=1 → 3 pkt + bonus 10 = 13 razem.
+    expect(s.punkty).toBe(3);
+    expect(s.punktyRazem).toBe(13);
+    expect(g.punkty).toBe(13);
     expect(g.wyczyszczonePlansze).toBe(1);
   });
 
-  it('drugie wyczyszczenie daje bonus 10', () => {
+  it('drugie wyczyszczenie daje bonus 20', () => {
     const g = new Gra(stalyLos(0.0));
     g.odNowa();
     g.wyczyszczonePlansze = 1;
@@ -98,8 +98,9 @@ describe('Gra (tury i koniec)', () => {
     ];
     const s = g.postaw(0, 0, 1);
     expect(s.nCzystychPrzed).toBe(1);
-    expect(s.bonusCzysta).toBe(10);
-    expect(s.punktyRazem).toBe(11);
+    expect(s.bonusCzysta).toBe(20);
+    expect(s.punkty).toBe(3);
+    expect(s.punktyRazem).toBe(23);
     expect(g.wyczyszczonePlansze).toBe(2);
   });
 

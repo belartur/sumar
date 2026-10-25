@@ -11,7 +11,7 @@ const czekaj = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, m
  * Pokazuje kaskadę krok po kroku: od stanu tuż po postawieniu (przed zdjęciami).
  * rysujTlo rysuje podaną planszę wraz z sumami.
  * poPoziomie(i) wywoływane jest po zdjęciu i-tego poziomu (0-bazowo),
- * żeby UI mogło pokazać punkty „gdyby ruch zakończył się w tym momencie".
+ * żeby UI mogło pokazać punkty za dany poziom kaskady (p×l×2^i).
  */
 export async function animujKaskade(
   h: Uchwyty,

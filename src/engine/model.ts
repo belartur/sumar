@@ -49,19 +49,19 @@ export interface PoziomKaskady {
 /** Wynik jednego postawienia klocka. */
 export interface WynikRuchu {
   poziomy: PoziomKaskady[];
-  /** L — sumaryczna liczba linii ze wszystkich poziomów. */
+  /** Suma l_k — liczba linii usuniętych na wszystkich poziomach. */
   sumaLinii: number;
-  /** K — sumaryczna liczba kaskad (indeks ostatniego poziomu, 0-bazowy; 0 gdy tylko poziom 0). */
+  /** K — indeks ostatniego poziomu (0-bazowy; 0 gdy tylko poziom 0). */
   kaskady: number;
   /** Liczba poziomów kaskady (= poziomy.length; 0 gdy nic nie zniknęło). */
   liczbaPoziomow: number;
-  /** L — liczba linii na pierwszym poziomie (pomocniczo, do testów). */
+  /** l_0 — liczba linii usuniętych na pierwszym poziomie (pomocniczo, do testów). */
   linieStart: number;
-  /** Punkty końcowe za ruch (same linie, bez bonusu za całą planszę). */
+  /** Punkty końcowe za ruch: suma p_k*l_k*2^k (bez bonusu za całą planszę). */
   punkty: number;
-  /** Punkty narastająco po każdej kaskadzie (gdyby ruch zakończył się w tym momencie). */
+  /** Punkty narastająco po każdym poziomie (suma poziomów 0..i). */
   punktyPoPoziomach: number[];
-  /** Punkty przyrostowo na każdy poziom: [A, B-A, C-B, …]; suma = punkty. */
+  /** Punkty za poszczególne poziomy: p_k*l_k*2^k; suma = punkty. */
   punktyPrzyrostowo: number[];
   /** Czy po pełnej kaskadzie plansza jest w 100% pusta (bonus za czyszczenie). */
   czyCzystaPlansza: boolean;
