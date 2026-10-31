@@ -6,9 +6,10 @@ import type { Uchwyty } from './uchwyty.ts';
 import { rysujPlansze, rysujTrojke } from './rysuj.ts';
 import { wczytajRekord, zapiszWynik } from './rekord.ts';
 import { przelaczWyciszenie, czyWyciszony } from './dzwiek.ts';
-import { wykonajRuch } from './ruch2.ts';
+import { pokazKoniec, wykonajRuch } from './ruch2.ts';
 import { podepnijDnd } from './dnd.ts';
 import { usunPlus } from './plus.ts';
+import { przywrocStan, zapiszStan } from './zapis.ts';
 
 export class Kontroler {
   private gra = new Gra(Math.random);
@@ -41,7 +42,13 @@ export class Kontroler {
     this.h = zbudujWidok(korzen);
     this.rekord = wczytajRekord();
     this.wiazZdarzenia();
-    this.nowaGra();
+    // Po wejściu na stronę wznawiamy zapisaną partię; bez zapisu startujemy od nowa.
+    if (przywrocStan(this.gra)) {
+      this.odswiez();
+      if (this.gra.koniec) pokazKoniec(this, false);
+    } else {
+      this.nowaGra();
+    }
   }
 
   private wiazZdarzenia(): void {
@@ -79,6 +86,7 @@ export class Kontroler {
     this.zajety = false;
     this.h.koniecNakladka.classList.add('ukryty');
     this.odswiez();
+    zapiszStan(this.gra);
   }
 
   /** Publiczne dla modułu ruchu. */

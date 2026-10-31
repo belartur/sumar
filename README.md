@@ -27,4 +27,6 @@ npm run test      # run unit tests (vitest)
 npm run typecheck # typecheck only
 ```
 
+`npm run build` creates a standalone `dist/index.html` with JS and CSS embedded, so it works both on a web server and when opened directly from disk. The game saves its progress in `localStorage` after every move and resumes automatically on the next visit.
+
 Full rules (in Polish) are in `opis.md`.

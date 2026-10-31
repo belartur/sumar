@@ -7,6 +7,7 @@ import { animujKaskade } from './anim.ts';
 import { plusCzystaPlansza, plusPrzyrostowy, plusKoniecRuchu } from './plus.ts';
 import { wyczyscPodglad } from './podglad.ts';
 import { zapiszWynik } from './rekord.ts';
+import { zapiszStan } from './zapis.ts';
 import { dzwiekPostawienia, dzwiekCzyszczenia, dzwiekKonca, dzwiekRekordu } from './dzwiek.ts';
 
 export async function wykonajRuch(k: Kontroler, slot: number, r: number, c: number): Promise<void> {
@@ -35,6 +36,8 @@ export async function wykonajRuch(k: Kontroler, slot: number, r: number, c: numb
   };
 
   const wynik = g.postaw(slot, r, c);
+  // Zapisujemy stan od razu po ruchu, jeszcze przed animacją kaskady.
+  zapiszStan(g);
 
   const rysujTlo = (p: Plansza): void => {
     const s = sumyLinii(p);
@@ -66,22 +69,25 @@ export async function wykonajRuch(k: Kontroler, slot: number, r: number, c: numb
   }
 
   k.zajetyRef = false;
-  if (wynik.koniecGry) zakoncz(k);
+  if (wynik.koniecGry) pokazKoniec(k);
   else k.odswiezRef();
 }
 
-function zakoncz(k: Kontroler): void {
+/** Pokazuje ekran końca gry. `zDzwiekiem = false` przy wznawianiu zapisanej partii. */
+export function pokazKoniec(k: Kontroler, zDzwiekiem = true): void {
   const g = k.graRef;
   const h = k.hRef;
   k.odswiezRef();
   const pobity = zapiszWynik(g.punkty);
+  if (pobity) k.rekordRef = g.punkty;
+  if (zDzwiekiem) {
+    if (pobity) dzwiekRekordu();
+    else dzwiekKonca();
+  }
   if (pobity) {
-    k.rekordRef = g.punkty;
-    dzwiekRekordu();
     h.koniecWynik.textContent = `${g.punkty} pkt 🏆`;
     h.koniecRekord.textContent = 'Nowy rekord! Gratulacje!';
   } else {
-    dzwiekKonca();
     h.koniecWynik.textContent = `${g.punkty} pkt`;
     h.koniecRekord.textContent = k.rekordRef > 0 ? `Rekord: ${k.rekordRef} pkt` : 'Zagraj jeszcze raz!';
   }
